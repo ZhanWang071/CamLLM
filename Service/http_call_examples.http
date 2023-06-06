@@ -1,0 +1,15 @@
+POST http://127.0.0.1:5000/chatgpt/question?debug=true HTTP/1.1
+content-type: application/json
+
+{
+    "question" : "Hello, who are you?"
+}
+
+POST http://127.0.0.1:5000/chatgpt/question?debug=true HTTP/1.1
+content-type: application/json
+
+{
+    "question" : "What can you do?"
+}
+
+Get http://127.0.0.1:5000/chatgpt/status HTTP/1.1

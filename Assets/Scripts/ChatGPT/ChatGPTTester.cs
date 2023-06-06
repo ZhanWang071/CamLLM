@@ -1,0 +1,66 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using OpenAI;
+
+public class ChatGPTTester : MonoBehaviour
+{
+    [SerializeField] private Button askButton;
+    [SerializeField] private InputField inputField;
+    //[SerializeField] private TextMeshProUGUI chatGPTAnswer;
+
+    [SerializeField] private string prompt;
+
+    [SerializeField] private ScrollRect scroll;
+
+    [SerializeField] private RectTransform sent;
+    [SerializeField] private RectTransform received;
+
+    private float height;
+
+    private List<ChatMessage> messages = new List<ChatMessage>();
+
+    public void Execute()
+    {
+        prompt = inputField.text;
+        AppendMessage(prompt, "user");
+
+        askButton.enabled = false;
+        inputField.text = "";
+        inputField.enabled = false;
+
+        StartCoroutine(ChatGPTClient.Instance.Ask(prompt, (r) => ProcessResponse(r)));
+    }
+
+    public void ProcessResponse(ChatGPTResponse response)
+    {
+        //Logger.Instance.LogInfo(response.Data);
+        if (response != null)
+        {
+            AppendMessage(response.Data, "AI");
+        }
+        else
+        {
+            Debug.LogWarning("No text was generated from this prompt.");
+        }
+
+        askButton.enabled = true;
+        inputField.enabled = true;
+    }
+
+    private void AppendMessage(string prompt, string role)
+    {
+        scroll.content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
+
+        var item = Instantiate(role == "user" ? sent : received, scroll.content);
+        item.GetChild(0).GetChild(0).GetComponent<Text>().text = prompt;
+        item.anchoredPosition = new Vector2(0, -height);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(item);
+        height += item.sizeDelta.y;
+        scroll.content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+        scroll.verticalNormalizedPosition = 0;
+    }
+
+}
