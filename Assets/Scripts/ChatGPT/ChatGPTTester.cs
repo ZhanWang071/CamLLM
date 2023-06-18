@@ -40,9 +40,10 @@ public class ChatGPTTester : MonoBehaviour
         var chatGPTContent = response.Choices.FirstOrDefault()?.Message?.Content;
         //Logger.Instance.LogInfo(response.Data);
 
-        if (chatGPTContent != null)
+        if (!string.IsNullOrEmpty(chatGPTContent))
         {
             AppendMessage(chatGPTContent, "ChatGPT");
+            CameraController.ProcessChatGPTResponse(chatGPTContent);
         }
         else
         {
