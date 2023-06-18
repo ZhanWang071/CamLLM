@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -36,10 +37,12 @@ public class ChatGPTTester : MonoBehaviour
 
     public void ProcessResponse(ChatGPTResponse response)
     {
+        var chatGPTContent = response.Choices.FirstOrDefault()?.Message?.Content;
         //Logger.Instance.LogInfo(response.Data);
-        if (response != null)
+
+        if (chatGPTContent != null)
         {
-            AppendMessage(response.Data, "AI");
+            AppendMessage(chatGPTContent, "ChatGPT");
         }
         else
         {

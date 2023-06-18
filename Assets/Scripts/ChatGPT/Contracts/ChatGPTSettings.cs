@@ -7,8 +7,13 @@ using UnityEngine;
 public class ChatGPTSettings : ScriptableObject
 {
 	public string apiURL;
+    //https://api.openai.com/v1/chat/completions
 
 	public string apiKey;
+
+	public string apiModel;
+
+	public string apiOrganization;
 
 	public bool debug;
 

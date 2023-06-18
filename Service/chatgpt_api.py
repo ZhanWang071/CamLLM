@@ -14,4 +14,4 @@ def get_completion(prompt, messages, model="gpt-3.5-turbo"):
     result = response.choices[0].message["content"]
     messages.append({"role": "assistant", "content": result})
     # print(messages)
-    return result
+    return response

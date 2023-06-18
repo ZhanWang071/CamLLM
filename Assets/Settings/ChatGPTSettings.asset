@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: ChatGPTSettings
   m_EditorClassIdentifier: 
   apiURL: http://127.0.0.1:5000/chatgpt/question
-  apiKey: 
+  apiKey: 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
+  apiModel: gpt-3.5-turbo
+  apiOrganization: org-o8iSUYeidKBtwEwQ4z8ZLvDs
   debug: 1
   reminders: []

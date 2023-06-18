@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
+using System.Globalization;
 
 public class ChatGPTClient : Singleton<ChatGPTClient>
 {
@@ -19,7 +20,15 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
 				JsonConvert.SerializeObject(new ChatGPTRequest
 				{
 					Question = prompt
-					// TODO add reminders to the question
+					//Model = chatGPTSettings.apiModel,
+					//Messages = new ChatGPTMessage[]
+     //               {
+					//	new ChatGPTMessage
+     //                   {
+					//		Role = "user",
+					//		Content = prompt
+     //                   }
+     //               }
 				}));
 
 			request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -29,6 +38,10 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
 			request.disposeCertificateHandlerOnDispose = true;
 
 			request.SetRequestHeader("Content-Type", "application/json");
+			//request.SetRequestHeader("Authorization", $"Bearer { chatGPTSettings.apiKey }");
+			//request.SetRequestHeader("OpenAI-Organization", chatGPTSettings.apiOrganization);
+
+			//var requestStartTime = DateTime.Now;
 
 			yield return request.SendWebRequest();
 
@@ -39,7 +52,7 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
 			else
 			{
 				string responseInfo = request.downloadHandler.text;
-				var response = new ChatGPTResponse { Data = responseInfo };
+				var response = JsonConvert.DeserializeObject<ChatGPTResponse>(responseInfo);
 				callBack(response);
 			}
 		}
