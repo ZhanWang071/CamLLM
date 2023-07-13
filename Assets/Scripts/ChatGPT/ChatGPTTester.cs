@@ -23,8 +23,11 @@ public class ChatGPTTester : MonoBehaviour
 
     private List<ChatMessage> messages = new List<ChatMessage>();
 
+    public CameraController cameraController;
+
     public void Execute()
     {
+        Debug.Log("Send the message");
         prompt = inputField.text;
         AppendMessage(prompt, "user");
 
@@ -42,7 +45,7 @@ public class ChatGPTTester : MonoBehaviour
         if (!string.IsNullOrEmpty(chatGPTContent))
         {
             AppendMessage(chatGPTContent, "ChatGPT");
-            CameraController.ProcessChatGPTResponse(chatGPTContent);
+            cameraController.ProcessChatGPTResponse(chatGPTContent);
         }
         else
         {
