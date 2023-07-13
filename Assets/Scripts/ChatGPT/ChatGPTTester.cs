@@ -38,7 +38,6 @@ public class ChatGPTTester : MonoBehaviour
     public void ProcessResponse(ChatGPTResponse response)
     {
         var chatGPTContent = response.Choices.FirstOrDefault()?.Message?.Content;
-        //Logger.Instance.LogInfo(response.Data);
 
         if (!string.IsNullOrEmpty(chatGPTContent))
         {
