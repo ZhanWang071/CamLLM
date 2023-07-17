@@ -19,6 +19,8 @@ public class CameraController : MonoBehaviour
         public string[] TourID;
     }
 
+    public string[] tourIDs;
+
     public CameraRecorder cameraRecorder;
 
     private void Start()
@@ -61,7 +63,7 @@ public class CameraController : MonoBehaviour
             // Example: Parse the response and extract camera control commands
             //bool shouldMoveForward = chatGPTContent.Contains("move forward");
             TourResponse tourResponse = JsonUtility.FromJson<TourResponse>(chatGPTContent);
-            string[] tourIDs = tourResponse.TourID;
+            tourIDs = tourResponse.TourID;
             //string reasoning = tourResponse.Reasoning;
             string[] tours = tourResponse.Tour;
             //foreach (string tour in tours)
@@ -77,7 +79,16 @@ public class CameraController : MonoBehaviour
             //targetRotation = Quaternion.Euler(0f, 90f, 0f);
 
             StartCoroutine(MoveCamera(tourIDs));
+            Debug.Log(tourIDs.Length);
         }
+    }
+
+
+    public void PlayButtonClicked()
+    {
+        Debug.Log("Replay the camera");
+        tourIndex = 0;
+        StartCoroutine(MoveCamera(tourIDs));
     }
 
     private void UpdateTargetCamera(string tourID)
