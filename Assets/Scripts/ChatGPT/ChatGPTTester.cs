@@ -18,17 +18,23 @@ public class ChatGPTTester : MonoBehaviour
 
     [SerializeField] private RectTransform sent;
     [SerializeField] private RectTransform received;
+    [SerializeField] private Text2Speech textToSpeech;
 
-    private float height;
+
+  private float height;
 
     private List<ChatMessage> messages = new List<ChatMessage>();
 
     public CameraController cameraController;
 
-    public void Execute()
+    public void Execute(string input = "")
     {
         Debug.Log("Send the message");
-        prompt = inputField.text;
+        if (string.IsNullOrEmpty(input)) {
+          prompt = inputField.text;
+        } else {
+          prompt = input;
+        }
         AppendMessage(prompt, "user");
 
         askButton.enabled = false;
@@ -46,6 +52,7 @@ public class ChatGPTTester : MonoBehaviour
         {
             AppendMessage(chatGPTContent, "ChatGPT");
             cameraController.ProcessChatGPTResponse(chatGPTContent);
+            textToSpeech.MakeAudioRequest(prompt);
         }
         else
         {
