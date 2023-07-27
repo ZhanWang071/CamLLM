@@ -51,8 +51,9 @@ public class ChatGPTTester : MonoBehaviour
         if (!string.IsNullOrEmpty(chatGPTContent))
         {
             AppendMessage(chatGPTContent, "ChatGPT");
+            Debug.Log("Response in voice...");
+            textToSpeech.MakeAudioRequest(chatGPTContent);
             cameraController.ProcessChatGPTResponse(chatGPTContent);
-            textToSpeech.MakeAudioRequest(prompt);
         }
         else
         {

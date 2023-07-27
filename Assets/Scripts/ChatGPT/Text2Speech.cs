@@ -23,6 +23,7 @@ public class Text2Speech : MonoBehaviour {
     };
 
     var response = await client.SynthesizeSpeechAsync(request);
+    Debug.Log("Response done.");
 
     WriteIntoFile(response.AudioStream);
 
