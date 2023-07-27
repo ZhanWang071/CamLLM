@@ -1,13 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.AI;
 
 public class CameraController : MonoBehaviour
 {
     private Camera mainCamera;
+    private Transform cameraTransform;
+
+    public CameraRecorder cameraRecorder;
 
     private Vector3 startPosition;
     private Quaternion startRotation;
-
     private static Vector3 targetPosition;
     private static Quaternion targetRotation;
 
@@ -21,11 +24,11 @@ public class CameraController : MonoBehaviour
 
     public string[] tourIDs;
 
-    public CameraRecorder cameraRecorder;
+    public NavMeshAgent navMeshAgent;
 
     private void Start()
     {
-        // Find the main camera GameObject
+        // Find the main camera GameObject and Transform
         mainCamera = Camera.main;
 
         if (mainCamera == null)
@@ -34,49 +37,43 @@ public class CameraController : MonoBehaviour
             return;
         }
 
+        cameraTransform = mainCamera.transform;
+
         // Perform initial camera setup
-        //mainCamera.transform.position = new Vector3(0f, 0f, -10f);
-        //mainCamera.transform.rotation = Quaternion.identity;
-        startPosition = mainCamera.transform.position;
-        startRotation = mainCamera.transform.rotation;
-        targetPosition = mainCamera.transform.position;
-        targetRotation = mainCamera.transform.rotation;
+        startPosition = cameraTransform.position;
+        startRotation = cameraTransform.rotation;
+        targetPosition = cameraTransform.position;
+        targetRotation = cameraTransform.rotation;
+
+        // Ensure that the camera starts in a valid NavMesh area
+        SetCameraToNearestNavMeshPosition();
     }
 
-    private void Update()
+    private void SetCameraToNearestNavMeshPosition()
     {
-        //if (mainCamera.transform.position != targetPosition || mainCamera.transform.rotation != targetRotation)
-        //{ 
-        //    StartCoroutine(MoveAndRotateCamera()); 
-        //}
-        //else
-        //{
-        //    startPosition = mainCamera.transform.position;
-        //    startRotation = mainCamera.transform.rotation;
-        //}
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(cameraTransform.position, out hit, 20f, NavMesh.AllAreas))
+        {
+            cameraTransform.position = hit.position;
+            navMeshAgent.SetDestination(hit.position);
+        }
+        else
+        {
+            Debug.LogWarning("Could not find a valid NavMesh position for the camera starting point.");
+        }
     }
+
+    private void Update() { }
 
     public void ProcessChatGPTResponse(string chatGPTContent)
     {
         if (!string.IsNullOrEmpty(chatGPTContent))
         {
-            // Example: Parse the response and extract camera control commands
-            //bool shouldMoveForward = chatGPTContent.Contains("move forward");
+            // Parse the response and extract camera control commands
             TourResponse tourResponse = JsonUtility.FromJson<TourResponse>(chatGPTContent);
             tourIDs = tourResponse.TourID;
             //string reasoning = tourResponse.Reasoning;
             string[] tours = tourResponse.Tour;
-            //foreach (string tour in tours)
-            //{
-            //    Debug.Log(tour);
-            //}
-            //foreach (string tourID in tourIDs)
-            //{
-            //    Debug.Log(tourID);
-            //}
-
-            //targetPosition = new Vector3(5f, 0f, 0f);
-            //targetRotation = Quaternion.Euler(0f, 90f, 0f);
 
             StartCoroutine(MoveCamera(tourIDs));
             Debug.Log(tourIDs.Length);
@@ -87,7 +84,6 @@ public class CameraController : MonoBehaviour
     public void PlayButtonClicked()
     {
         Debug.Log("Replay the camera");
-        tourIndex = 0;
         StartCoroutine(MoveCamera(tourIDs));
     }
 
@@ -99,54 +95,36 @@ public class CameraController : MonoBehaviour
         targetRotation = cameraRecorder.GetCameraOrientation(cameraID);
     }
 
-    //private IEnumerator MoveAndRotateCamera()
-    //{
-    //    float duration = 2f;
-    //    float elapsedTime = 0f;
-
-    //    while (elapsedTime < duration)
-    //    {
-    //        elapsedTime += Time.deltaTime;
-
-    //        // Smoothly interpolate the camera position and rotation
-    //        float t = Mathf.SmoothStep(0f, 1f, elapsedTime / duration);
-    //        mainCamera.transform.position = Vector3.Lerp(startPosition, targetPosition, t);
-    //        mainCamera.transform.rotation = Quaternion.Lerp(startRotation, targetRotation, t);
-
-    //        yield return null;
-    //    }
-    //}
-
-    private int tourIndex = 0;
+    private float waitTime = 1f;
+    private float rotationSpeed = 30f;
 
     private IEnumerator MoveCamera(string[] tourIDs)
     {
-        float duration = 2f;
-        float waitTime = 1f;
+        // update camera start and target positions and orientations
+        UpdateTargetCamera(tourIDs[0]);
 
-        while (tourIndex < tourIDs.Length)
+        for (int i = 0; i < tourIDs.Length; i++)
         {
-            float elapsedTime = 0f;
-            // Move the camera to the current position
-            UpdateTargetCamera(tourIDs[tourIndex]);
-            while (elapsedTime < duration)
-            {
-                elapsedTime += Time.deltaTime;
-                float t = Mathf.SmoothStep(0f, 1f, elapsedTime / duration);
-                mainCamera.transform.position = Vector3.Lerp(startPosition, targetPosition, t);
-                mainCamera.transform.rotation = Quaternion.Lerp(startRotation, targetRotation, t);
+            UpdateTargetCamera(tourIDs[i]);
+            navMeshAgent.SetDestination(targetPosition);
 
+            // Wait until the camera reaches the painting
+            while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+            {
                 yield return null;
             }
 
-            startPosition = targetPosition;
-            startRotation = targetRotation;
+            // After the camera reaches the target painting, rotate the camera smoothly
+            while (Quaternion.Angle(cameraTransform.rotation, targetRotation) > 0.1f)
+            {
+                cameraTransform.rotation = Quaternion.RotateTowards(cameraTransform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                yield return null;
+            }
 
             // Wait at the current position
             yield return new WaitForSeconds(waitTime);
-
-            // Move to the next position in the array
-            tourIndex = tourIndex + 1;
         }
+
     }
+
 }
