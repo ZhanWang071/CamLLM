@@ -26,7 +26,7 @@ public class Museum : MonoBehaviour
         cameraRecorder.AddCameraData("Camera.012", new Vector3(-230f, 16.5f, 75f), Quaternion.Euler(0f, 0f, 0f));
         cameraRecorder.AddCameraData("Camera.013", new Vector3(-52.5f, 16.5f, -75.3f), Quaternion.Euler(0f, 180f, 0f));
         cameraRecorder.AddCameraData("Camera.014", new Vector3(-34.5f, 16.5f, -59f), Quaternion.Euler(0f, 120f, 0f));
-        cameraRecorder.AddCameraData("Camera.015", new Vector3(-69.5f, 16.5f, 74.35f), Quaternion.Euler(0f, 180f, 0f));
+        cameraRecorder.AddCameraData("Camera.015", new Vector3(-69.5f, 16.5f, -74.35f), Quaternion.Euler(0f, 180f, 0f));
     }
 
     private void Update()

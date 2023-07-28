@@ -25,6 +25,8 @@ public class ChatGPTTester : MonoBehaviour
 
     public CameraController cameraController;
 
+    public GameObject Model;
+
     public void Execute()
     {
         Debug.Log("Send the message");
@@ -35,7 +37,10 @@ public class ChatGPTTester : MonoBehaviour
         inputField.text = "";
         inputField.enabled = false;
 
-        StartCoroutine(ChatGPTClient.Instance.Ask(prompt, (r) => ProcessResponse(r)));
+        // Transform the main camera position into the local transform of the scene gameobject
+        string currentPosition = Model.transform.InverseTransformPoint(Camera.main.transform.position).ToString();
+
+        StartCoroutine(ChatGPTClient.Instance.Ask(prompt, currentPosition, (r) => ProcessResponse(r)));
     }
 
     public void ProcessResponse(ChatGPTResponse response)

@@ -10,7 +10,7 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
 	[SerializeField]
 	private ChatGPTSettings chatGPTSettings;
 
-	public IEnumerator Ask(string prompt, System.Action<ChatGPTResponse> callBack)
+	public IEnumerator Ask(string prompt, string position, System.Action<ChatGPTResponse> callBack)
     {
 		var url = chatGPTSettings.debug ? $"{chatGPTSettings.apiURL}?debug=true" : chatGPTSettings.apiURL;
 
@@ -19,17 +19,18 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
 			byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(
 				JsonConvert.SerializeObject(new ChatGPTRequest
 				{
-					Question = prompt
-					//Model = chatGPTSettings.apiModel,
-					//Messages = new ChatGPTMessage[]
-     //               {
-					//	new ChatGPTMessage
-     //                   {
-					//		Role = "user",
-					//		Content = prompt
-     //                   }
-     //               }
-				}));
+					Question = prompt,
+					Position = position
+                    //Model = chatGPTSettings.apiModel,
+                    //Messages = new ChatGPTMessage[]
+                    //               {
+                    //	new ChatGPTMessage
+                    //                   {
+                    //		Role = "user",
+                    //		Content = prompt
+                    //                   }
+                    //               }
+                }));
 
 			request.uploadHandler = new UploadHandlerRaw(bodyRaw);
 			request.downloadHandler = new DownloadHandlerBuffer();
