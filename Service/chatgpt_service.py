@@ -22,7 +22,7 @@ def question():
         print("ChatGPT Question Received...")
         print("ChatGPTR Question is: {}".format(question))
     
-    response = get_completion(question, messages)
+    response = get_completion(prompt, messages)
 
     if args.get("debug", default=False, type=bool):
         print("ChatGPT Response Received...")

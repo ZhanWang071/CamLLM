@@ -21,19 +21,22 @@ public class ChatGPTTester : MonoBehaviour
     [SerializeField] private Text2Speech textToSpeech;
 
 
+
   private float height;
 
     private List<ChatMessage> messages = new List<ChatMessage>();
 
     public CameraController cameraController;
 
+    public GameObject Model;
+
     public void Execute(string input = "")
     {
         Debug.Log("Send the message");
         if (string.IsNullOrEmpty(input)) {
-          prompt = inputField.text;
+            prompt = inputField.text;
         } else {
-          prompt = input;
+            prompt = input;
         }
         AppendMessage(prompt, "user");
 
@@ -41,7 +44,10 @@ public class ChatGPTTester : MonoBehaviour
         inputField.text = "";
         inputField.enabled = false;
 
-        StartCoroutine(ChatGPTClient.Instance.Ask(prompt, (r) => ProcessResponse(r)));
+        // Transform the main camera position into the local transform of the scene gameobject
+        string currentPosition = Model.transform.InverseTransformPoint(Camera.main.transform.position).ToString();
+
+        StartCoroutine(ChatGPTClient.Instance.Ask(prompt, currentPosition, (r) => ProcessResponse(r)));
     }
 
     public void ProcessResponse(ChatGPTResponse response)

@@ -1,13 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.AI;
+using System.Collections.Generic;
 
 public class CameraController : MonoBehaviour
 {
     private Camera mainCamera;
+    private Transform cameraTransform;
+
+    public CameraRecorder cameraRecorder;
+
+    private Vector3 initalPosition;
+    private Quaternion initalRotation;
 
     private Vector3 startPosition;
     private Quaternion startRotation;
-
     private static Vector3 targetPosition;
     private static Quaternion targetRotation;
 
@@ -21,11 +28,11 @@ public class CameraController : MonoBehaviour
 
     public string[] tourIDs;
 
-    public CameraRecorder cameraRecorder;
+    public NavMeshAgent navMeshAgent;
 
     private void Start()
     {
-        // Find the main camera GameObject
+        // Find the main camera GameObject and Transform
         mainCamera = Camera.main;
 
         if (mainCamera == null)
@@ -34,60 +41,147 @@ public class CameraController : MonoBehaviour
             return;
         }
 
+        cameraTransform = mainCamera.transform;
+
         // Perform initial camera setup
-        //mainCamera.transform.position = new Vector3(0f, 0f, -10f);
-        //mainCamera.transform.rotation = Quaternion.identity;
-        startPosition = mainCamera.transform.position;
-        startRotation = mainCamera.transform.rotation;
-        targetPosition = mainCamera.transform.position;
-        targetRotation = mainCamera.transform.rotation;
+        initalPosition = cameraTransform.position;
+        initalRotation = cameraTransform.rotation;
+
+        startPosition = cameraTransform.position;
+        startRotation = cameraTransform.rotation;
+
+        targetPosition = cameraTransform.position;
+        targetRotation = cameraTransform.rotation;
+
+        // Ensure that the camera starts in a valid NavMesh area
+        SetCameraToNearestNavMeshPosition();
     }
 
-    private void Update()
+    private void SetCameraToNearestNavMeshPosition()
     {
-        //if (mainCamera.transform.position != targetPosition || mainCamera.transform.rotation != targetRotation)
-        //{ 
-        //    StartCoroutine(MoveAndRotateCamera()); 
-        //}
-        //else
-        //{
-        //    startPosition = mainCamera.transform.position;
-        //    startRotation = mainCamera.transform.rotation;
-        //}
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(cameraTransform.position, out hit, 20f, NavMesh.AllAreas))
+        {
+            cameraTransform.position = hit.position;
+            navMeshAgent.SetDestination(hit.position);
+        }
+        else
+        {
+            Debug.LogWarning("Could not find a valid NavMesh position for the camera starting point.");
+        }
+    }
+
+    private void Update() 
+    {
+        // Test camera movement
+        Test();
+    }
+
+    private void Test()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            string chatGPTContent = "{\n    \"Reasoning\": \"The visitor has a special interest in Chinese art, show him more related paintings.\",\n    \"Tour\": [\n        \"Guernica\",\n        \"The Birth of Venus\",\n        \"The Scream\",\n        \"The Great Wave off Kanagawa\",\n        \"The Persistence of Memory\",\n        \"The Last Judgment\",\n        \"The Creation of Adam\",\n        \"The Starry Night\"\n    ],\n    \"TourID\": [\n        \"painting 015\",\n        \"painting 013\",\n        \"painting 014\",\n        \"painting 008\",\n        \"painting 010\",\n        \"painting 012\",\n        \"painting 011\",\n        \"painting 009\"\n    ]\n}";
+            ProcessChatGPTResponse(chatGPTContent);
+        }
     }
 
     public void ProcessChatGPTResponse(string chatGPTContent)
     {
+        Debug.Log("Process ChatGPT Response");
+
         if (!string.IsNullOrEmpty(chatGPTContent))
         {
-            // Example: Parse the response and extract camera control commands
-            //bool shouldMoveForward = chatGPTContent.Contains("move forward");
+            // Parse the response and extract camera control commands
             TourResponse tourResponse = JsonUtility.FromJson<TourResponse>(chatGPTContent);
             tourIDs = tourResponse.TourID;
             //string reasoning = tourResponse.Reasoning;
             string[] tours = tourResponse.Tour;
-            //foreach (string tour in tours)
-            //{
-            //    Debug.Log(tour);
-            //}
-            //foreach (string tourID in tourIDs)
-            //{
-            //    Debug.Log(tourID);
-            //}
 
-            //targetPosition = new Vector3(5f, 0f, 0f);
-            //targetRotation = Quaternion.Euler(0f, 90f, 0f);
-
+            Debug.Log("Start navigation");
             StartCoroutine(MoveCamera(tourIDs));
-            Debug.Log(tourIDs.Length);
+
         }
     }
 
+    private void PrintLandmarks(string[] tourIDs)
+    {
+        for (int i = 0; i < tourIDs.Length; i++)
+        {
+            Debug.Log(tourIDs[i]);
+        }
+    }
+
+    private void ReorderLandmarks(string[] tourIDs)
+    {
+        // If there are no landmarks to visit, return
+        if (tourIDs.Length <= 1)
+            //yield break;
+            return;
+
+        // Create a new list to store the reordered IDs
+        List<string> reorderedTourIDs = new List<string>();
+
+        // Start from the camera's current position as the initial position
+        Vector3 currentPosition = cameraTransform.position;
+
+        // Find the closest landmark and add it to the reordered list
+        while (tourIDs.Length > 0)
+        {
+            string closestLandmarkID = FindClosestLandmark(currentPosition);
+            reorderedTourIDs.Add(closestLandmarkID);
+
+            // Remove the selected landmark from the original array
+            tourIDs = RemoveElementFromArray(tourIDs, closestLandmarkID);
+
+            // Update the current position to the selected landmark's position
+            currentPosition = GetPositionFromTourID(closestLandmarkID);
+
+            //yield return null;
+        }
+
+        // Update the tourIDs with the reordered list
+        tourIDs = reorderedTourIDs.ToArray();
+
+        Debug.Log("Reorder finished");
+        PrintLandmarks(tourIDs);
+    }
+
+    // Helper function to find the closest landmark to a given position
+    private string FindClosestLandmark(Vector3 position)
+    {
+        string closestID = "";
+        float closestDistance = float.MaxValue;
+
+        foreach (string tourID in tourIDs)
+        {
+            Vector3 landmarkPosition = GetPositionFromTourID(tourID);
+            float distance = Vector3.Distance(position, landmarkPosition);
+
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestID = tourID;
+            }
+        }
+
+        return closestID;
+    }
+
+    // Helper function to remove an element from an array
+    private T[] RemoveElementFromArray<T>(T[] array, T element)
+    {
+        List<T> list = new List<T>(array);
+        list.Remove(element);
+        return list.ToArray();
+    }
 
     public void PlayButtonClicked()
     {
         Debug.Log("Replay the camera");
-        tourIndex = 0;
+        cameraTransform.position = initalPosition;
+        cameraTransform.rotation = initalRotation;
+
         StartCoroutine(MoveCamera(tourIDs));
     }
 
@@ -99,54 +193,42 @@ public class CameraController : MonoBehaviour
         targetRotation = cameraRecorder.GetCameraOrientation(cameraID);
     }
 
-    //private IEnumerator MoveAndRotateCamera()
-    //{
-    //    float duration = 2f;
-    //    float elapsedTime = 0f;
+    public Vector3 GetPositionFromTourID(string tourID)
+    {
+        string cameraID = tourID.Replace("painting ", "Camera.");
+        return cameraRecorder.GetCameraPosition(cameraID);
+    }
 
-    //    while (elapsedTime < duration)
-    //    {
-    //        elapsedTime += Time.deltaTime;
-
-    //        // Smoothly interpolate the camera position and rotation
-    //        float t = Mathf.SmoothStep(0f, 1f, elapsedTime / duration);
-    //        mainCamera.transform.position = Vector3.Lerp(startPosition, targetPosition, t);
-    //        mainCamera.transform.rotation = Quaternion.Lerp(startRotation, targetRotation, t);
-
-    //        yield return null;
-    //    }
-    //}
-
-    private int tourIndex = 0;
+    private float waitTime = 1f;
+    private float rotationSpeed = 30f;
 
     private IEnumerator MoveCamera(string[] tourIDs)
     {
-        float duration = 2f;
-        float waitTime = 1f;
 
-        while (tourIndex < tourIDs.Length)
+        for (int i = 0; i < tourIDs.Length; i++)
         {
-            float elapsedTime = 0f;
-            // Move the camera to the current position
-            UpdateTargetCamera(tourIDs[tourIndex]);
-            while (elapsedTime < duration)
-            {
-                elapsedTime += Time.deltaTime;
-                float t = Mathf.SmoothStep(0f, 1f, elapsedTime / duration);
-                mainCamera.transform.position = Vector3.Lerp(startPosition, targetPosition, t);
-                mainCamera.transform.rotation = Quaternion.Lerp(startRotation, targetRotation, t);
+            Debug.Log(tourIDs[i]);
+            // update camera target positions and orientations
+            UpdateTargetCamera(tourIDs[i]);
+            navMeshAgent.SetDestination(targetPosition);
 
+            // Wait until the camera reaches the painting
+            while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+            {
                 yield return null;
             }
 
-            startPosition = targetPosition;
-            startRotation = targetRotation;
+            // After the camera reaches the target painting, rotate the camera smoothly
+            while (Quaternion.Angle(cameraTransform.rotation, targetRotation) > 0.1f)
+            {
+                cameraTransform.rotation = Quaternion.RotateTowards(cameraTransform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                yield return null;
+            }
 
             // Wait at the current position
             yield return new WaitForSeconds(waitTime);
-
-            // Move to the next position in the array
-            tourIndex = tourIndex + 1;
         }
+
     }
+
 }
