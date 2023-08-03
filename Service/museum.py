@@ -81,7 +81,7 @@ data = {
             "orientation": (270.0, 0.0, 270.0)
         },
         "painting 016": {
-            "name": "DasUndbild",
+            "name": "Das Undbild",
             "position": (-27.75, 1.6, 5.2),
             "orientation": (270.0, 0.0, 0.0)
         },
@@ -91,17 +91,17 @@ data = {
             "orientation": (270.0, 0.0, 0.0)
         },
         "painting 018": {
-            "name": "Composition_10",
+            "name": "Composition no.10",
             "position": (27.75, 1.6, -5.2),
             "orientation": (270.0, 0.0, 180.0)
         },
         "painting 019": {
-            "name": "Head(Tête)",
+            "name": "Head (Tête)",
             "position": (27.75, 1.5, 5.2),
             "orientation": (270.0, 0.0, 180.0)
         },
         "painting 020": {
-            "name": "James_Abbot_McNeill_Whistler_012",
+            "name": "Night in Black and Gold, The falling Rocket",
             "position": (-6.0, 2.0, 7.1525),
             "orientation": (270.0, 0.0, 0.0)
         },
@@ -121,42 +121,42 @@ data = {
             "orientation": (270.0, 0.0, 90.0)
         },
         "painting 024": {
-            "name": "Krishna_and_Radha",
+            "name": "Krishna and Radha",
             "position": (-14.42, 2.0, -6.0),
             "orientation": (270.0, 0.0, 90.0)
         },
         "painting 025": {
-            "name": "Khan_Bahadur_Khan_with_men_of_his_clan",
+            "name": "Khan Bahadur Khan with men of his clan",
             "position": (-9.43, 2.0, 6.0),
             "orientation": (270.0, 0.0, 270.0)
         },
         "painting 026": {
-            "name": "Emperor_Jahangir_At_The_Jharoka_Window_Of_The_Agra_Fort",
+            "name": "Emperor Jahangir At The Jharoka Window Of The Agra Fort",
             "position": (-14.57, 2.0, 6.0),
             "orientation": (270.0, 0.0, 270.0)
         },
         "painting 027": {
-            "name": "Nauroz_durbar_of_Jahangir_(left_half)",
+            "name": "Nauroz durbar of Jahangir (left half)",
             "position": (9.43, 2.0, -6.0),
             "orientation": (270.0, 0.0, 90.0)
         },
         "painting 028": {
-            "name": "MET_DP156677",
+            "name": "Pichhwai for the Festival of Cows",
             "position": (14.57, 2.0, -6.0),
             "orientation": (270.0, 0.0, 90.0)
         },
         "painting 029": {
-            "name": "Flowers_in_a_Green_Vase_by_Leon_Dabo",
+            "name": "Flowers in a Green Vase by Leon Dabo",
             "position": (-18.0, 2.0, 0.0),
             "orientation": (270.0, 0.0, 180.0)
         },
         "painting 030": {
-            "name": "Study_of_Flesh_Color_and_Gold",
+            "name": "Study of Flesh Color and Gold",
             "position": (5.0, 2.4, 34.45),
             "orientation": (270.0, 0.0, 180.0)
         },
         "painting 031": {
-            "name": "Whistler_James_Venetian_Scene_1879",
+            "name": "Whistler James Venetian Scene 1879",
             "position": (-5.0, 2.4, 34.45),
             "orientation": (270.0, 0.0, 0.0)
         },
@@ -166,7 +166,7 @@ data = {
             "orientation": (270.0, 0.0, 0.0)
         },
         "painting 033": {
-            "name": "Chardin_pastel_selfportrait",
+            "name": "Chardin pastel selfportrait",
             "position": (-0.15, 2.6, 48.14),
             "orientation": (270.0, 0.0, 180.0)
         },
