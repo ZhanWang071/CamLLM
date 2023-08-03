@@ -2,29 +2,119 @@ import openai
 from museum import data
 import json
 import math
+import museum
+import prompts
+import copy
 
 openai.api_key = "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"
 
-def get_completion(request, messages, model="gpt-3.5-turbo"):
-    prompt = request["question"]
-    position = string_to_position(request["position"])
+# messages = [{"role": "system", "content": "You are a helpful assistant."}]
+messages = [{"role": "system", "content": prompts.init_prompt}]
 
-    messages.append({"role": "user", "content": prompt})
+def gpt_guidance(request):
+    question = request["question"]
+    position = string_to_position(request["position"])
+    if (len(request["landmark"])):
+        landmark = data["paintings"][request["landmark"]]["name"]
+    else:
+        landmark = request["landmark"]
+
+    messages.append({"role": "user", "content": question})
+
+    print(messages)
+
+    tasks = task_classify(question)
+    print("Task Classification: " + str(tasks))
+
+    if "information enhancement" in tasks:
+        response = gpt_information(question, position, landmark)
+    if "preference specification" in tasks:
+        response = gpt_preference(question)
+    if "navigation" in tasks:
+        response = gpt_navigation(question, position, landmark)
     
+    messages.append({"role": "assistant", "content": response})
+    print(messages)
+
+    return response
+
+"""Step 1: classify the user question into which kinds of interaction tasks
+"""
+def task_classify(request, model="gpt-3.5-turbo"):
+    # request = prompts.task_classify_prompt+ "INPUT:\n" + request +"\nRESPONSE:\n"
+    task_classify_messages = [{"role": "system", "content": prompts.task_classify_prompt}]
+    task_classify_messages.append({"role": "user", "content": request})
+
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=task_classify_messages,
+        temperature=0,
+    )
+    result = response.choices[0].message["content"]     # Preference Specification, Navigation
+
+    # Remove parentheses if they exist
+    if result.startswith("(") and result.endswith(")"):
+        result = result[1:-1]
+
+    result = result.split(', ')     # ['Preference Specification', 'Navigation']
+    return result
+
+
+"""
+Step 2: According classification results, assign the task into the corresponsding models and get the response
+    - navigation: 1) a tour; 2) direct search for one item
+    - information enhancement: give related information
+    - preference specification: 
+"""
+
+# TODO: We need to differentiate the tour and direct search
+def gpt_navigation(question, position, landmark,model="gpt-3.5-turbo"):
+    print("Navigation: ")
+
+    # remember the history conversation and give the response
+    navigation_messages = copy.deepcopy(messages)
+    navigation_messages[0]["content"] = museum.navigation_prompt
+    print(navigation_messages)
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=navigation_messages,
+        temperature=0,
+    )
+    result = response.choices[0].message["content"] 
+    print(result)
+    result_ordered = reorder_landmarks(result, position)
+
+    return result_ordered
+
+def gpt_information(question, position, landmark, model="gpt-3.5-turbo"):
+    print("Information Enhancement: ")
+    if (len(landmark)):
+        messages[-1]["content"] = "Now I am looking at the painting " + str(landmark) + ". " + question
+    else:
+        messages[-1]["content"] = "Now I am standing at the position in the model: " + str(position) + ". " + question
+
     response = openai.ChatCompletion.create(
         model=model,
         messages=messages,
-        temperature=0, # this is the degree of randomness of the model's output
+        temperature=0,
     )
 
-    #  "{\n    \"Reasoning\": \"The visitor has a special interest in Chinese art, show him more related paintings.\",\n    \"Tour\": [\"Along the River During the Qingming Festival\", \"Dwelling in the Fuchun Mountains\", \"A Thousand Li of Rivers and Mountains\", \"Bamboo and Rock\", \"The Night Revels of Han Xizai\", \"Eighteen Songs of a Nomad Flute\", \"The Rongxi Studio\", \"The Red Cliff\"],\n    \"TourID\": [\"painting 008\", \"painting 009\", \"painting 010\", \"painting 011\", \"painting 012\", \"painting 013\", \"painting 014\", \"painting 015\"]\n}"
     result = response.choices[0].message["content"]
-    result_ordered = reorder_landmarks(result, position)
+    print(result)
+    return result
 
-    response.choices[0].message["content"] = result_ordered
-    messages.append({"role": "assistant", "content": result_ordered})
-    
-    return response
+# TODO: Analysis user preference and give some natural response
+def gpt_preference(question, model="gpt-3.5-turbo"):
+    print("User Preference: ")
+
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=messages,
+        temperature=0,
+    )
+    result = response.choices[0].message["content"]
+    print(result)
+    return result
 
 def string_to_position(string_position):
     x, y, z = map(float, string_position[1:-2].split(','))

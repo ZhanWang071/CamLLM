@@ -10,7 +10,7 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
 	[SerializeField]
 	private ChatGPTSettings chatGPTSettings;
 
-	public IEnumerator Ask(string prompt, string position, System.Action<ChatGPTResponse> callBack)
+	public IEnumerator Ask(string prompt, string position, string landmark, System.Action<ChatGPTResponse> callBack)
     {
 		var url = chatGPTSettings.debug ? $"{chatGPTSettings.apiURL}?debug=true" : chatGPTSettings.apiURL;
 
@@ -20,7 +20,8 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
 				JsonConvert.SerializeObject(new ChatGPTRequest
 				{
 					Question = prompt,
-					Position = position
+					Position = position,
+					Landmark = landmark
                     //Model = chatGPTSettings.apiModel,
                     //Messages = new ChatGPTMessage[]
                     //               {

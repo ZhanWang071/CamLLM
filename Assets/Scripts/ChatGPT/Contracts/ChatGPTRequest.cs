@@ -13,4 +13,7 @@ public class ChatGPTRequest
 
     [JsonProperty(PropertyName = "position")]
     public string Position { get; set; }
+
+    [JsonProperty(PropertyName = "landmark")]
+    public string Landmark { get; set; }
 }

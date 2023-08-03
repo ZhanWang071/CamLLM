@@ -18,6 +18,7 @@ public class ChatGPTTester : MonoBehaviour
 
     [SerializeField] private RectTransform sent;
     [SerializeField] private RectTransform received;
+    public bool Voice = false;
     [SerializeField] private Text2Speech textToSpeech;
 
 
@@ -45,19 +46,20 @@ public class ChatGPTTester : MonoBehaviour
 
         // Transform the main camera position into the local transform of the scene gameobject
         string currentPosition = Model.transform.InverseTransformPoint(Camera.main.transform.position).ToString();
-
-        StartCoroutine(ChatGPTClient.Instance.Ask(prompt, currentPosition, (r) => ProcessResponse(r)));
+        string landmark = cameraController.GetCurrentLandmark();
+        StartCoroutine(ChatGPTClient.Instance.Ask(prompt, currentPosition, landmark, (r) => ProcessResponse(r)));
     }
 
     public void ProcessResponse(ChatGPTResponse response)
     {
-        var chatGPTContent = response.Choices.FirstOrDefault()?.Message?.Content;
+        //var chatGPTContent = response.Choices.FirstOrDefault()?.Message?.Content;
+        var chatGPTContent = response.Content;
 
         if (!string.IsNullOrEmpty(chatGPTContent))
         {
             AppendMessage(chatGPTContent, "ChatGPT");
             Debug.Log("Response in voice...");
-            textToSpeech.MakeAudioRequest(chatGPTContent);
+            if (Voice) textToSpeech.MakeAudioRequest(chatGPTContent);
             cameraController.ProcessChatGPTResponse(chatGPTContent);
         }
         else
@@ -74,7 +76,7 @@ public class ChatGPTTester : MonoBehaviour
         scroll.content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
 
         var item = Instantiate(role == "user" ? sent : received, scroll.content);
-        item.GetChild(0).GetChild(0).GetComponent<Text>().text = prompt;
+        item.GetChild(0).GetChild(0).GetComponent<Text>().text = cameraController.ResponseJsonOrNot(prompt); ;
         item.anchoredPosition = new Vector2(0, -height);
         LayoutRebuilder.ForceRebuildLayoutImmediate(item);
         height += item.sizeDelta.y;
