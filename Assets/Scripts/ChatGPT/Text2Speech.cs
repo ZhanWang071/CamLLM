@@ -7,9 +7,11 @@ using Amazon.Polly.Model;
 using System.Threading.Tasks;
 using UnityEngine.Events;
 using UnityEngine.Networking;
+using System.Collections;
 
 public class Text2Speech : MonoBehaviour {
   [SerializeField] private AudioSource audioSource;
+  [SerializeField] private Animator animator;
 
   public async void MakeAudioRequest(string message) {
     var credentials = new BasicAWSCredentials("AKIAWV2UJSGVFD5HMY5V", "kbu4E4vrHcJ8zdPHOGv7Zw2uBimEqDO5uW9lPMKK");
@@ -46,6 +48,10 @@ public class Text2Speech : MonoBehaviour {
 
       audioSource.clip = clip;
       audioSource.Play();
+
+      animator.SetBool("Talk", true);
+      while (audioSource.isPlaying) await Task.Yield();
+      animator.SetBool("Talk", false);
     }
   }
 
