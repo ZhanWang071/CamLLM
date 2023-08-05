@@ -30,6 +30,15 @@ public class ChatGPTTester : MonoBehaviour
 
     public GameObject Model;
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            AppendMessage("I really interested in chinese art.", "user");
+            AppendMessage("That's great! Chinese art has a rich history and is known for its unique styles and techniques.\n In our virtual museum, we have several Chinese paintings that you might find interesting. Here are a few of them:\r\n\r\n1. \"Section of Goddess of Luo River\": This painting depicts a beautiful landscape with mountains, rivers, and trees. It showcases the traditional Chinese ink painting style.\r\n\r\n2. \"Travelers among Mountains and Streams\": This painting portrays a group of travelers navigating through a mountainous landscape. It is a classic example of Chinese landscape painting.\r\n\r\n3. \"Head (T¨ºte)\": This artwork is a portrait of a Chinese figure. It showcases the skillful use of colors and brushstrokes commonly found in Chinese portrait painting.\r\n\r\n4. \"Krishna and Radha\": This painting depicts the Hindu deities Krishna and Radha, but it was created by a Chinese artist. It showcases the influence of Indian art on Chinese painting.\r\n\r\nThese are just a few examples of the Chinese art we have in our museum. If you would like to explore more, I can guide you to these paintings in the virtual space.", "assistant");
+        }
+    }
+
     public void Execute(string input = "")
     {
         Debug.Log("Send the message");
@@ -57,7 +66,7 @@ public class ChatGPTTester : MonoBehaviour
 
         if (!string.IsNullOrEmpty(chatGPTContent))
         {
-            AppendMessage(chatGPTContent, "ChatGPT");
+            AppendMessage(chatGPTContent, "assistant");
             Debug.Log("Response in voice...");
             if (Voice) textToSpeech.MakeAudioRequest(chatGPTContent);
             cameraController.ProcessChatGPTResponse(chatGPTContent);
@@ -76,7 +85,7 @@ public class ChatGPTTester : MonoBehaviour
         scroll.content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
 
         var item = Instantiate(role == "user" ? sent : received, scroll.content);
-        item.GetChild(0).GetChild(0).GetComponent<Text>().text = cameraController.ResponseJsonOrNot(prompt); ;
+        item.GetChild(0).GetChild(1).GetChild(0).GetComponent<Text>().text = cameraController.ResponseJsonOrNot(prompt); ;
         item.anchoredPosition = new Vector2(0, -height);
         LayoutRebuilder.ForceRebuildLayoutImmediate(item);
         height += item.sizeDelta.y;
