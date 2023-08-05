@@ -21,7 +21,7 @@ public class CameraController : MonoBehaviour
     [System.Serializable]
     public class TourResponse
     {
-        public string reasoning;
+        public string Introduction;
         public string[] Tour;
         public string[] TourID;
     }
@@ -79,11 +79,16 @@ public class CameraController : MonoBehaviour
 
     private void Test()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             string chatGPTContent = "{\n    \"Reasoning\": \"The visitor has a special interest in Chinese art, show him more related paintings.\",\n    \"Tour\": [\n        \"Guernica\",\n        \"The Birth of Venus\",\n        \"The Scream\",\n        \"The Great Wave off Kanagawa\",\n        \"The Persistence of Memory\",\n        \"The Last Judgment\",\n        \"The Creation of Adam\",\n        \"The Starry Night\"\n    ],\n    \"TourID\": [\n        \"painting 015\",\n        \"painting 013\",\n        \"painting 014\",\n        \"painting 008\",\n        \"painting 010\",\n        \"painting 012\",\n        \"painting 011\",\n        \"painting 009\"\n    ]\n}";
             ProcessChatGPTResponse(chatGPTContent);
         }
+    }
+
+    public string GetCurrentLandmark()
+    {
+        return Landmark;
     }
 
     public void ProcessChatGPTResponse(string chatGPTContent)
@@ -92,15 +97,36 @@ public class CameraController : MonoBehaviour
 
         if (!string.IsNullOrEmpty(chatGPTContent))
         {
-            // Parse the response and extract camera control commands
-            TourResponse tourResponse = JsonUtility.FromJson<TourResponse>(chatGPTContent);
-            tourIDs = tourResponse.TourID;
-            //string reasoning = tourResponse.Reasoning;
-            string[] tours = tourResponse.Tour;
+            try
+            {
+                // Parse the response and extract camera control commands
+                TourResponse tourResponse = JsonUtility.FromJson<TourResponse>(chatGPTContent);
+                tourIDs = tourResponse.TourID;
+                //string reasoning = tourResponse.Reasoning;
+                string[] tours = tourResponse.Tour;
 
-            Debug.Log("Start navigation");
-            StartCoroutine(MoveCamera(tourIDs));
+                Debug.Log("Start navigation");
+                StartCoroutine(NavigationTour(tourIDs));
+            }
+            catch (System.Exception){  }
 
+        }
+    }
+
+    // detect whether the response string is a json format
+    public string ResponseJsonOrNot(string response)
+    {
+        try
+        {
+            // Try to deserialize the JSON string into a dummy C# object
+            TourResponse tourResponse = JsonUtility.FromJson<TourResponse>(response);
+            // If deserialization succeeds, it means the string is in valid JSON format
+            return tourResponse.Introduction;
+        }
+        catch (System.Exception)
+        {
+            // If deserialization fails, it means the string is not in valid JSON format
+            return response;
         }
     }
 
@@ -182,7 +208,7 @@ public class CameraController : MonoBehaviour
         cameraTransform.position = initalPosition;
         cameraTransform.rotation = initalRotation;
 
-        StartCoroutine(MoveCamera(tourIDs));
+        StartCoroutine(NavigationTour(tourIDs));
     }
 
     private void UpdateTargetCamera(string tourID)
@@ -202,11 +228,14 @@ public class CameraController : MonoBehaviour
     private float waitTime = 1f;
     private float rotationSpeed = 30f;
 
-    private IEnumerator MoveCamera(string[] tourIDs)
+    private string Landmark = "";
+
+    private IEnumerator NavigationTour(string[] tourIDs)
     {
 
         for (int i = 0; i < tourIDs.Length; i++)
         {
+            Landmark = tourIDs[i];
             Debug.Log(tourIDs[i]);
             // update camera target positions and orientations
             UpdateTargetCamera(tourIDs[i]);
@@ -228,7 +257,27 @@ public class CameraController : MonoBehaviour
             // Wait at the current position
             yield return new WaitForSeconds(waitTime);
         }
-
     }
 
+    private IEnumerator NavigationSingle(string tourID)
+    {
+        Landmark = tourID;
+        UpdateTargetCamera(tourID);
+        navMeshAgent.SetDestination(targetPosition);
+
+        // Wait until the camera reaches the painting
+        while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+        {
+            yield return null;
+        }
+
+        // After the camera reaches the target painting, rotate the camera smoothly
+        while (Quaternion.Angle(cameraTransform.rotation, targetRotation) > 0.1f)
+        {
+            cameraTransform.rotation = Quaternion.RotateTowards(cameraTransform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            yield return null;
+        }
+
+        yield return null;
+    }
 }

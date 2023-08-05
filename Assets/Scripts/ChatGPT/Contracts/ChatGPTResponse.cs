@@ -2,22 +2,28 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
+//public class ChatGPTResponse
+//{
+//    [JsonProperty("id")]
+//    public string Id { get; set; }
+
+//    [JsonProperty("object")]
+//    public string Object { get; set; }
+
+//    [JsonProperty("created")]
+//    public long Created { get; set; }
+
+//    [JsonProperty("choices")]
+//    public List<ChatGPTChoice> Choices { get; set; }
+
+//    [JsonProperty("usage")]
+//    public ChatGPTUsage Usage { get; set; }
+//}
+
 public class ChatGPTResponse
 {
-    [JsonProperty("id")]
-    public string Id { get; set; }
-
-    [JsonProperty("object")]
-    public string Object { get; set; }
-
-    [JsonProperty("created")]
-    public long Created { get; set; }
-
-    [JsonProperty("choices")]
-    public List<ChatGPTChoice> Choices { get; set; }
-
-    [JsonProperty("usage")]
-    public ChatGPTUsage Usage { get; set; }
+    [JsonProperty("content")]
+    public string Content { get; set; }
 }
 
 public class ChatGPTMessage

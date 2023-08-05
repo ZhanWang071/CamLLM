@@ -1,12 +1,9 @@
 # from chatgpt_wrapper import ChatGPT
 from flask import Flask, request, jsonify
-from chatgpt_api import get_completion
+from chatgpt_api import gpt_guidance
 import museum
 
 app = Flask(__name__)
-# messages = [{"role": "system", "content": "You are a helpful assistant."}]
-messages = [{"role": "system", "content": museum.startPrompt}]
-
 
 @app.route("/chatgpt/status", methods=["GET"])
 def status():
@@ -20,15 +17,15 @@ def question():
 
     if args.get("debug", default=False, type=bool):
         print("ChatGPT Question Received...")
-        print("ChatGPTR Question is: {}".format(question))
+        print("ChatGPT Question is: {}".format(question))
     
-    response = get_completion(prompt, messages)
+    response = gpt_guidance(prompt)
 
     if args.get("debug", default=False, type=bool):
         print("ChatGPT Response Received...")
         print(response)
     
-    return response
+    return jsonify(content=response)
 
 if __name__ == "__main__":
     app.run(threaded=False)

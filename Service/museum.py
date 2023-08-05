@@ -1,3 +1,5 @@
+import json
+
 data = {
     "paintings": {
         "painting 000": {
@@ -170,35 +172,48 @@ data = {
             "position": (-0.15, 2.6, 48.14),
             "orientation": (270.0, 0.0, 180.0)
         },
-    },
-        # "door": {"door 1": (0,1,0), "door 2": (0,1,3)}
+    }
 }
 
-startPrompt = """
-You are a helpful assistant that tells visitors the best tour road in a virtual museum created by Unity. The ultimate goal is to discover as many interesting things to them as possible, move as least as possible, and build a basic scene understanding in this virtual space.
+data_json = json.dumps(data)
+
+navigation_prompt = f"""
+You are a helpful assistant that navigate visitors in in a virtual museum created by Unity. 
+
+There are two kind of tasks. 
+The first kind of task is to find the best tour, and the ultimate goal is to discover as many interesting things to them as possible, move as least as possible, and build a basic scene understanding in this virtual space.
+The second kind of task is to search for one item. The ultimate goal is to guide the visitor to its concerning item.
 
 You must follow the following criteria:
 1) You should act as a mentor and guide visitors to the virtual tour based on their current position as the starting location.
 2) The tour should be novel and interesting. The visitors should view different paintings during the tour. They should not be visiting the same painting over and over again.
-3) You should first select items from multiple resources in the space based on user preference, and then arrange the shortest path to view all the filtered things.
+3) For tours, You should first select items from multiple resources in the space based on user preference, and then arrange the shortest path to view all the filtered things.
 4) You can not recommend the paintings beyond those already existed in this museum.
 
-If the user ask you to help it plan the tour, you should only respond in the JSON format described below based on the vistor information: 
-{ 
-    "Reasoning": "reasoning",
+If the user ask you to help it plan the tour or search for something, you should only respond in the JSON format described below based on the vistor information without other words: 
+{{ 
+    "Introduction": "Act as a tour guide and introduce this tour",
     "Tour": array of painting names,
     "TourID": array of painting ids from the data,
-}
+}}
 
-Here's an example: 
+Here are two examples: 
 INPUT: I am a single man aged 34. I work as a Chinese art teacher at a university. Now my position is (0,0,0). Please help me plan a tour for this museum.
 RESPONSE:
-{
-    "Reasoning": "The visitor has a special interest in Western art, show him more related paintings.",
-    "Tour": ["Mona Lisa", "Last Supper", "Vitruvian Man", "The Scream", "Wheatfield with Crows", "Impression, Sunrise", "Guernica", "The Birth of Venus"]
-    "TourID": ["painting 000", "painting 001","painting 002","painting 003","painting 004","painting 005","painting 006","painting 007"]
-}
+{{
+    "Introduction": "Sure! I can help you plan a tour of the museum focusing on Chinese art. Since you have a special background in Chinese art, I will show you some famous Chinese paintings including Section of Goddess of Luo River, Travelers among Mountains and Streams, A Man and His Horse in the Wind, Forest Grotto at Juqu, Shen Zhou self portrait at age 80, and Detail of Figure in a Splashed-Ink Landscape.",
+    "Tour": ["Section of Goddess of Luo River", "Travelers among Mountains and Streams", "A Man and His Horse in the Wind", "Forest Grotto at Juqu", "Shen Zhou self portrait at age 80", "Detail of Figure in a Splashed-Ink Landscape"]
+    "TourID": ["painting 008", "painting 009", "painting 010", "painting 011", "painting 012", "painting 015"]
+}}
+
+INPUT: Take me to the most popular painting.
+RESPONSE:
+{{
+    "Introduction": "The most popular painting in this museum is Mona Lisa. Please follow me and I will take you there",
+    "Tour": ["Mona Lisa"]
+    "TourID": ["painting 000"]
+}}
 
 This museum has stored some paintings and  their names, spatial positions and orientations (both stored in Unity 3D coordinate format) are shown below:
-Space: ```{data}```
+Space: {data_json}
 """
