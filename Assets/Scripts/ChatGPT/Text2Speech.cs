@@ -10,59 +10,90 @@ using UnityEngine.Networking;
 using System.Collections;
 
 public class Text2Speech : MonoBehaviour {
-  [SerializeField] private AudioSource audioSource;
-  [SerializeField] private Animator animator;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private Animator animator;
 
-  public async void MakeAudioRequest(string message) {
-    var credentials = new BasicAWSCredentials("AKIAWV2UJSGVFD5HMY5V", "kbu4E4vrHcJ8zdPHOGv7Zw2uBimEqDO5uW9lPMKK");
-    var client = new AmazonPollyClient(credentials, RegionEndpoint.APNortheast1);
+    private void Start() {
+        // Test the talk motion
+        TestSaySomething();
+    }
 
-    var request = new SynthesizeSpeechRequest() {
-      Text = message,
-      Engine = Engine.Neural,
-      VoiceId = VoiceId.Ayanda,
-      OutputFormat = OutputFormat.Mp3
-    };
 
-    var response = await client.SynthesizeSpeechAsync(request);
-    Debug.Log("Response done.");
+    private async void TestSaySomething() {
+        string audioPath;
+#if UNITY_ANDROID && !UNITY_EDITOR
+        audioPath = $"jar:file://{Application.persistentDataPath}/audio.mp3";
+#elif (UNITY_IOS || UNITY_OSX) && !UNITY_EDITOR
+        audioPath = $"file://{Application.persistentDataPath}/audio.mp3";
+#else
+        audioPath = $"{Application.persistentDataPath}/audio.mp3";
+#endif
+        using (var www = UnityWebRequestMultimedia.GetAudioClip(audioPath, AudioType.MPEG)) {
+            var op = www.SendWebRequest();
 
-    WriteIntoFile(response.AudioStream);
+            while (!op.isDone) await Task.Yield();
 
-    string audioPath;
+            var clip = DownloadHandlerAudioClip.GetContent(www);
+
+            audioSource.clip = clip;
+            audioSource.Play();
+
+            animator.SetBool("Talk", true);
+            while (audioSource.isPlaying) await Task.Yield();
+            animator.SetBool("Talk", false);
+        }
+    }
+
+    public async void MakeAudioRequest(string message) {
+        var credentials = new BasicAWSCredentials("AKIAWV2UJSGVFD5HMY5V", "kbu4E4vrHcJ8zdPHOGv7Zw2uBimEqDO5uW9lPMKK");
+        var client = new AmazonPollyClient(credentials, RegionEndpoint.APNortheast1);
+
+        var request = new SynthesizeSpeechRequest() {
+            Text = message,
+            Engine = Engine.Neural,
+            VoiceId = VoiceId.Ayanda,
+            OutputFormat = OutputFormat.Mp3
+        };
+
+        var response = await client.SynthesizeSpeechAsync(request);
+        Debug.Log("Response done.");
+
+        WriteIntoFile(response.AudioStream);
+
+        string audioPath;
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-            audioPath = $"jar:file://{Application.persistentDataPath}/audio.mp3";
+        audioPath = $"jar:file://{Application.persistentDataPath}/audio.mp3";
 #elif (UNITY_IOS || UNITY_OSX) && !UNITY_EDITOR
-            audioPath = $"file://{Application.persistentDataPath}/audio.mp3";
+        audioPath = $"file://{Application.persistentDataPath}/audio.mp3";
 #else
-    audioPath = $"{Application.persistentDataPath}/audio.mp3";
+        audioPath = $"{Application.persistentDataPath}/audio.mp3";
 #endif
 
-    using (var www = UnityWebRequestMultimedia.GetAudioClip(audioPath, AudioType.MPEG)) {
-      var op = www.SendWebRequest();
+        using (var www = UnityWebRequestMultimedia.GetAudioClip(audioPath, AudioType.MPEG)) {
+            var op = www.SendWebRequest();
 
-      while (!op.isDone) await Task.Yield();
+            while (!op.isDone) await Task.Yield();
 
-      var clip = DownloadHandlerAudioClip.GetContent(www);
+            var clip = DownloadHandlerAudioClip.GetContent(www);
 
-      audioSource.clip = clip;
-      audioSource.Play();
+            audioSource.clip = clip;
+            audioSource.Play();
 
-      animator.SetBool("Talk", true);
-      while (audioSource.isPlaying) await Task.Yield();
-      animator.SetBool("Talk", false);
+            animator.SetBool("Talk", true);
+            while (audioSource.isPlaying) await Task.Yield();
+            animator.SetBool("Talk", false);
+        }
     }
-  }
 
-  private void WriteIntoFile(Stream stream) {
-    using (var fileStream = new FileStream($"{Application.persistentDataPath}/audio.mp3", FileMode.Create)) {
-      byte[] buffer = new byte[8 * 1024];
-      int bytesRead;
+    private void WriteIntoFile(Stream stream) {
+        using (var fileStream = new FileStream($"{Application.persistentDataPath}/audio.mp3", FileMode.Create)) {
+            byte[] buffer = new byte[8 * 1024];
+            int bytesRead;
 
-      while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0) {
-        fileStream.Write(buffer, 0, bytesRead);
-      }
+            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0) {
+                fileStream.Write(buffer, 0, bytesRead);
+            }
+        }
     }
-  }
 }
