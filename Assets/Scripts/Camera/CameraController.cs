@@ -97,19 +97,33 @@ public class CameraController : MonoBehaviour
 
         if (!string.IsNullOrEmpty(chatGPTContent))
         {
-            try
-            {
-                // Parse the response and extract camera control commands
-                TourResponse tourResponse = JsonUtility.FromJson<TourResponse>(chatGPTContent);
-                tourIDs = tourResponse.TourID;
-                //string reasoning = tourResponse.Reasoning;
-                string[] tours = tourResponse.Tour;
+            // Parse the response and extract camera control commands
+            TourResponse tourResponse = JsonUtility.FromJson<TourResponse>(chatGPTContent);
+            tourIDs = tourResponse.TourID;
+            //string reasoning = tourResponse.Reasoning;
+            string[] tours = tourResponse.Tour;
 
-                Debug.Log("Start navigation");
-                StartCoroutine(NavigationTour(tourIDs));
-            }
-            catch (System.Exception){  }
+            Debug.Log("Start navigation");
+            StartCoroutine(NavigationTour(tourIDs));
+        }
+    }
 
+    public void ProcessChatGPTResponse(string chatGPTContent, bool Voice, Text2Speech textToSpeech)
+    {
+        Debug.Log("Process ChatGPT Response");
+
+        if (!string.IsNullOrEmpty(chatGPTContent))
+        {
+            // Parse the response and extract camera control commands
+            TourResponse tourResponse = JsonUtility.FromJson<TourResponse>(chatGPTContent);
+            tourIDs = tourResponse.TourID;
+            //string reasoning = tourResponse.Reasoning;
+            string[] tours = tourResponse.Tour;
+
+            if (Voice) textToSpeech.MakeAudioRequest(tourResponse.Introduction);
+
+            Debug.Log("Start navigation");
+            StartCoroutine(NavigationTour(tourIDs));
         }
     }
 

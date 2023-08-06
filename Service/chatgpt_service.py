@@ -19,13 +19,13 @@ def question():
         print("ChatGPT Question Received...")
         print("ChatGPT Question is: {}".format(question))
     
-    response = gpt_guidance(prompt)
+    [tasks, response] = gpt_guidance(prompt)
 
     if args.get("debug", default=False, type=bool):
         print("ChatGPT Response Received...")
         print(response)
     
-    return jsonify(content=response)
+    return jsonify(content=response, tasks=tasks)
 
 if __name__ == "__main__":
     app.run(threaded=False)
