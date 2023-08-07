@@ -35,7 +35,8 @@ public class ChatGPTTester : MonoBehaviour
 
     private void Start()
     {
-        ShowChatbox();
+        //ShowChatbox();
+        HideChatbox();
     }
 
     private void Update()
@@ -73,12 +74,19 @@ public class ChatGPTTester : MonoBehaviour
 
     [SerializeField] private GameObject Chatbox;
     [SerializeField] private GameObject ChatboxButton;
+    private bool isChatboxShow = false;
     public void HideChatbox()
     {
         if (Chatbox != null)
         {
             Chatbox.SetActive(false);
             ChatboxButton.SetActive(true);
+
+            Vector3 currentPosition = ChatboxButton.transform.position;
+            currentPosition.y = 74.0f;
+            ChatboxButton.transform.position = currentPosition;
+
+            isChatboxShow = false;
         }
     }
 
@@ -87,7 +95,25 @@ public class ChatGPTTester : MonoBehaviour
         if (Chatbox != null)
         {
             Chatbox.SetActive(true);
-            ChatboxButton.SetActive(false);
+            //ChatboxButton.SetActive(false);
+
+            Vector3 currentPosition = ChatboxButton.transform.position;
+            currentPosition.y = 780.0f;
+            ChatboxButton.transform.position = currentPosition;
+
+            isChatboxShow = true;
+        }
+    }
+
+    public void ChatboxButtonClicked()
+    {
+        if (isChatboxShow)
+        {
+            HideChatbox();
+        }
+        else
+        {
+            ShowChatbox();
         }
     }
 
