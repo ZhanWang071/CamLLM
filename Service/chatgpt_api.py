@@ -1,10 +1,11 @@
 import openai
-from museum import data
+from museum import data_spatial
 import json
 import math
 import museum
 import prompts
 import copy
+import re
 
 openai.api_key = "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"
 
@@ -15,7 +16,7 @@ def gpt_guidance(request):
     question = request["question"]
     position = string_to_position(request["position"])
     if (len(request["landmark"])):
-        landmark = data["paintings"][request["landmark"]]["name"]
+        landmark = data_spatial["paintings"][request["landmark"]]["name"]
     else:
         landmark = request["landmark"]
 
@@ -80,11 +81,23 @@ def gpt_navigation(question, position, landmark,model="gpt-3.5-turbo"):
         messages=navigation_messages,
         temperature=0,
     )
-    result = response.choices[0].message["content"] 
+    result = response.choices[0].message["content"]
+    result = extract_json_part(result)
     print(result)
     result_ordered = reorder_landmarks(result, position)
 
     return result_ordered
+
+def extract_json_part(input_string):
+    pattern = r'{[^{}]*}'
+
+    match = re.search(pattern, input_string)
+
+    if match:
+        json_like_part = match.group()
+        return json_like_part
+    else:
+        return None
 
 def gpt_information(question, position, landmark, model="gpt-3.5-turbo"):
     print("Response for Information Enhancement: ")
@@ -140,7 +153,7 @@ def reorder_landmarks(result, start_position):
     tour_data = json.loads(result)
     tour_names = tour_data["Tour"]
     tour_ids = tour_data["TourID"]
-    tour_positions = [data["paintings"][tour_id]["position"] for tour_id in tour_ids]
+    tour_positions = [data_spatial["paintings"][tour_id]["position"] for tour_id in tour_ids]
 
     num_landmarks = len(tour_positions)
 

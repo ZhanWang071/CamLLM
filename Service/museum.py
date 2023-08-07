@@ -1,6 +1,6 @@
 import json
 
-data = {
+data_spatial = {
     "paintings": {
         "painting 000": {
             "name": "Mona Lisa", 
@@ -175,7 +175,115 @@ data = {
     }
 }
 
+data = {
+    "paintings": {
+        "painting 000": {
+            "name": "Mona Lisa", 
+        },
+        "painting 001": {
+            "name": "Last Supper",
+        },
+        "painting 002": {
+            "name": "Vitruvian Man",
+        },
+        "painting 003": {
+            "name": "The Scream",
+        },
+        "painting 004": {
+            "name": "Wheatfield with Crows",
+        },
+        "painting 005": {
+            "name": "Impression, Sunrise",
+        },
+        "painting 006": {
+            "name": "Guernica",
+        },
+        "painting 007": {
+            "name": "The Birth of Venus",
+        },
+        "painting 008": {
+            "name": "Section of Goddess of Luo River",
+        },
+        "painting 009": {
+            "name": "Travelers among Mountains and Streams",
+        },
+        "painting 010": {
+            "name": "A Man and His Horse in the Wind",
+        },
+        "painting 011": {
+            "name": "Forest Grotto at Juqu",
+        },
+        "painting 012": {
+            "name": "Shen Zhou self portrait at age 80",
+        },
+        "painting 013": {
+            "name": "The Great Wave",
+        },
+        "painting 014": {
+            "name": "A woodcut",
+        },
+        "painting 015": {
+            "name": "Detail of Figure in a Splashed-Ink Landscape",
+        },
+        "painting 016": {
+            "name": "DasUndbild",
+        },
+        "painting 017": {
+            "name": "Caoutchouc",
+        },
+        "painting 018": {
+            "name": "Composition_10",
+        },
+        "painting 019": {
+            "name": "Head(Tête)",
+        },
+        "painting 020": {
+            "name": "James_Abbot_McNeill_Whistler_012",
+        },
+        "painting 021": {
+            "name": "Premier Disque",
+        },
+        "painting 022": {
+            "name": "Tarentelle",
+        },
+        "painting 023": {
+            "name": "Amorpha",
+        },
+        "painting 024": {
+            "name": "Krishna_and_Radha",
+        },
+        "painting 025": {
+            "name": "Khan_Bahadur_Khan_with_men_of_his_clan",
+        },
+        "painting 026": {
+            "name": "Emperor_Jahangir_At_The_Jharoka_Window_Of_The_Agra_Fort",
+        },
+        "painting 027": {
+            "name": "Nauroz_durbar_of_Jahangir_(left_half)",
+        },
+        "painting 028": {
+            "name": "MET_DP156677",
+        },
+        "painting 029": {
+            "name": "Flowers_in_a_Green_Vase_by_Leon_Dabo",
+        },
+        "painting 030": {
+            "name": "Study_of_Flesh_Color_and_Gold",
+        },
+        "painting 031": {
+            "name": "Whistler_James_Venetian_Scene_1879",
+        },
+        "painting 032": {
+            "name": "Louis15",
+        },
+        "painting 033": {
+            "name": "Chardin_pastel_selfportrait",
+        },
+    }
+}
+
 data_json = json.dumps(data)
+data_spatial_json = json.dumps(data_spatial)
 
 navigation_prompt = f"""
 You are a helpful assistant that navigate visitors in in a virtual museum created by Unity. 
@@ -215,5 +323,5 @@ RESPONSE:
 }}
 
 This museum has stored some paintings and  their names, spatial positions and orientations (both stored in Unity 3D coordinate format) are shown below:
-Space: {data_json}
+Space: {data_spatial_json}
 """

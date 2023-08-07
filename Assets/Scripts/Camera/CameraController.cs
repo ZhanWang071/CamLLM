@@ -71,10 +71,14 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    private void Update() 
+    private void Update()
     {
         // Test camera movement
         Test();
+        if (navigating)
+        {
+            MoveArrow();
+        }
     }
 
     private void Test()
@@ -254,6 +258,7 @@ public class CameraController : MonoBehaviour
             // update camera target positions and orientations
             UpdateTargetCamera(tourIDs[i]);
             navMeshAgent.SetDestination(targetPosition);
+            CalculateNavPath(targetPosition);
 
             // Wait until the camera reaches the painting
             while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
@@ -278,6 +283,7 @@ public class CameraController : MonoBehaviour
         Landmark = tourID;
         UpdateTargetCamera(tourID);
         navMeshAgent.SetDestination(targetPosition);
+        CalculateNavPath(targetPosition);
 
         // Wait until the camera reaches the painting
         while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
@@ -293,5 +299,54 @@ public class CameraController : MonoBehaviour
         }
 
         yield return null;
+    }
+
+    [SerializeField] private GameObject arrowPrefab;
+    private bool navigating;
+    private GameObject arrow;
+
+    private void CalculateNavPath(Vector3 targetPosition)
+    {
+        NavMeshPath path = new NavMeshPath();
+        if (NavMesh.CalculatePath(cameraTransform.position, targetPosition, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete)
+        {
+            navigating = true;
+
+            // Instantiate the arrow prefab at the calculated position
+            arrow = Instantiate(arrowPrefab, path.corners[1], Quaternion.identity);
+            Vector3 arrowPosition = arrow.transform.position;
+            arrowPosition.y = 6.0f;
+            arrow.transform.position = arrowPosition;
+            arrow.transform.localScale = new Vector3(3f, 3f, 3f);
+
+            Destroy(arrow, GetPathLength(path) / navMeshAgent.speed);
+        }
+    }
+
+    private float GetPathLength(NavMeshPath path)
+    {
+        float distance = 0f;
+        for (int i = 1; i < path.corners.Length; i++)
+        {
+            distance += Vector3.Distance(path.corners[i - 1], path.corners[i]);
+        }
+        return distance;
+    }
+
+    private float arrowSpeed = 5f;
+    private void MoveArrow()
+    {
+        if (arrow != null)
+        {
+            Vector3 direction = (targetPosition - cameraTransform.position).normalized;
+            arrow.transform.Translate(direction * arrowSpeed * Time.deltaTime, Space.World);
+
+            direction.y = 0f;
+            if (direction != Vector3.zero)
+            {
+                Quaternion rotation = Quaternion.LookRotation(direction);
+                arrow.transform.rotation = rotation * Quaternion.Euler(0f, 90f, 0f);
+            }
+        }
     }
 }
