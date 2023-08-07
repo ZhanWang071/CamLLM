@@ -18,7 +18,6 @@ public class Text2Speech : MonoBehaviour {
         TestSaySomething();
     }
 
-
     private async void TestSaySomething() {
         string audioPath;
 #if UNITY_ANDROID && !UNITY_EDITOR

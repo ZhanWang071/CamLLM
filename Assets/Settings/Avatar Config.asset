@@ -22,5 +22,6 @@ MonoBehaviour:
   UseMeshOptCompression: 0
   MorphTargets:
   - Oculus Visemes
+  - mouthSmile
   - eyeBlinkLeft
-  - none
+  - eyeSquintRight
