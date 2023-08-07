@@ -21,8 +21,6 @@ def gpt_guidance(request):
 
     messages.append({"role": "user", "content": question})
 
-    print(messages)
-
     tasks = task_classify(question)
     print("Task Classification: " + str(tasks))
 
@@ -32,9 +30,11 @@ def gpt_guidance(request):
         response = gpt_preference(question)
     if "navigation" in tasks:
         response = gpt_navigation(question, position, landmark)
+    if "error" in tasks:
+        response = gpt_error(question)
     
     messages.append({"role": "assistant", "content": response})
-    print(messages)
+    # print(messages)
 
     return [tasks, response]
 
@@ -69,7 +69,7 @@ Step 2: According classification results, assign the task into the corresponsdin
 
 # TODO: We need to differentiate the tour and direct search
 def gpt_navigation(question, position, landmark,model="gpt-3.5-turbo"):
-    print("Navigation: ")
+    print("Response for Navigation: ")
 
     # remember the history conversation and give the response
     navigation_messages = copy.deepcopy(messages)
@@ -87,7 +87,7 @@ def gpt_navigation(question, position, landmark,model="gpt-3.5-turbo"):
     return result_ordered
 
 def gpt_information(question, position, landmark, model="gpt-3.5-turbo"):
-    print("Information Enhancement: ")
+    print("Response for Information Enhancement: ")
     if (len(landmark)):
         messages[-1]["content"] = "Now I am looking at the painting " + str(landmark) + ". " + question
     else:
@@ -105,7 +105,19 @@ def gpt_information(question, position, landmark, model="gpt-3.5-turbo"):
 
 # TODO: Analysis user preference and give some natural response
 def gpt_preference(question, model="gpt-3.5-turbo"):
-    print("User Preference: ")
+    print("Response for User Preference: ")
+
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=messages,
+        temperature=0,
+    )
+    result = response.choices[0].message["content"]
+    print(result)
+    return result
+
+def gpt_error(question, model="gpt-3.5-turbo"):
+    print("Response for Error: ")
 
     response = openai.ChatCompletion.create(
         model=model,

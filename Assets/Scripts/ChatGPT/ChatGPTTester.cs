@@ -33,6 +33,11 @@ public class ChatGPTTester : MonoBehaviour
 
     public GameObject Model;
 
+    private void Start()
+    {
+        ShowChatbox();
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha2))
@@ -66,6 +71,26 @@ public class ChatGPTTester : MonoBehaviour
         StartCoroutine(ChatGPTClient.Instance.Ask(prompt, currentPosition, landmark, (r) => ProcessResponse(r)));
     }
 
+    [SerializeField] private GameObject Chatbox;
+    [SerializeField] private GameObject ChatboxButton;
+    public void HideChatbox()
+    {
+        if (Chatbox != null)
+        {
+            Chatbox.SetActive(false);
+            ChatboxButton.SetActive(true);
+        }
+    }
+
+    public void ShowChatbox()
+    {
+        if (Chatbox != null)
+        {
+            Chatbox.SetActive(true);
+            ChatboxButton.SetActive(false);
+        }
+    }
+
     public void ProcessResponse(ChatGPTResponse response)
     {
         //var chatGPTContent = response.Choices.FirstOrDefault()?.Message?.Content;
@@ -76,11 +101,13 @@ public class ChatGPTTester : MonoBehaviour
         {
             AppendMessage(chatGPTContent, "assistant");
             Debug.Log("Response in voice...");
+            HideChatbox();
 
             if (ResponseTasks.Contains("information enhancement"))
             {
                 DisplayInfo(chatGPTContent);
             }
+
             if (ResponseTasks.Contains("navigation"))
             {
                 cameraController.ProcessChatGPTResponse(chatGPTContent, Voice, textToSpeech);
