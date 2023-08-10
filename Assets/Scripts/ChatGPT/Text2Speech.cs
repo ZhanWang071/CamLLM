@@ -10,12 +10,14 @@ using UnityEngine.Networking;
 using System.Collections;
 
 public class Text2Speech : MonoBehaviour {
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] private Animator animator;
+    private AudioSource audioSource;
+    private Animator animator;
 
     private void Start() {
+        audioSource = GetComponent<AudioSource>();
+        animator = GetComponent<Animator>();
         // Test the talk motion
-        TestSaySomething();
+        // TestSaySomething();
     }
 
     private async void TestSaySomething() {
