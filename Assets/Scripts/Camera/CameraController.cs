@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.AI;
 using System.Collections.Generic;
+using System;
 
 public class CameraController : MonoBehaviour
 {
@@ -17,6 +18,10 @@ public class CameraController : MonoBehaviour
     private Quaternion startRotation;
     private static Vector3 targetPosition;
     private static Quaternion targetRotation;
+
+    public static event Action<string[]> OnTourIDsReceived;
+    public static event Action OnCameraReached;
+    private bool canContinue = false;
 
     [System.Serializable]
     public class TourResponse
@@ -90,6 +95,18 @@ public class CameraController : MonoBehaviour
         }
     }
 
+    private void OnEnable() {
+        AvatarController.OnAvatarReached += HandleAvatarReached;
+    }
+
+    private void OnDisable() {
+        AvatarController.OnAvatarReached -= HandleAvatarReached;
+    }
+
+    private void HandleAvatarReached() {
+        canContinue = true;
+    }
+
     public string GetCurrentLandmark()
     {
         return Landmark;
@@ -107,6 +124,7 @@ public class CameraController : MonoBehaviour
             //string reasoning = tourResponse.Reasoning;
             string[] tours = tourResponse.Tour;
 
+            OnTourIDsReceived?.Invoke(tourIDs);
             Debug.Log("Start navigation");
             StartCoroutine(NavigationTour(tourIDs));
         }
@@ -260,6 +278,8 @@ public class CameraController : MonoBehaviour
             navMeshAgent.SetDestination(targetPosition);
             CalculateNavPath(targetPosition);
 
+            yield return new WaitUntil(() => canContinue);
+
             // Wait until the camera reaches the painting
             while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
             {
@@ -272,6 +292,9 @@ public class CameraController : MonoBehaviour
                 cameraTransform.rotation = Quaternion.RotateTowards(cameraTransform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
                 yield return null;
             }
+
+            canContinue = false;
+            OnCameraReached?.Invoke();
 
             // Wait at the current position
             yield return new WaitForSeconds(waitTime);

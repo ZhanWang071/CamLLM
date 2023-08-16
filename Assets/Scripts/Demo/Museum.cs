@@ -45,6 +45,14 @@ public class Museum : MonoBehaviour
         cameraRecorder.AddCameraData("Camera.031", new Vector3(-159f, 19f, 172f), Quaternion.Euler(0f, 270f, 0f));
         cameraRecorder.AddCameraData("Camera.032", new Vector3(-133f, 20f, 241f), Quaternion.Euler(0f, 270f, 0f));
         cameraRecorder.AddCameraData("Camera.033", new Vector3(-166f, 21f, 241f), Quaternion.Euler(0f, 90f, 0f));
+        cameraRecorder.AddCameraData("Avatar.015", new Vector3(-64f, 17.1f, -66f), Quaternion.Euler(0f, 210f, 0f));
+        cameraRecorder.AddCameraData("Avatar.013", new Vector3(-39f, 17.1f, -64f), Quaternion.Euler(0f, 210f, 0f));
+        cameraRecorder.AddCameraData("Avatar.014", new Vector3(-27f, 16.5f, -48f), Quaternion.Euler(0f, 150f, 0f));
+        cameraRecorder.AddCameraData("Avatar.008", new Vector3(-42f, 16.5f, 68f), Quaternion.Euler(0f, 90f, 0f));
+        cameraRecorder.AddCameraData("Avatar.010", new Vector3(-70f, 16.5f, 67f), Quaternion.Euler(0f, 30f, 0f));
+        cameraRecorder.AddCameraData("Avatar.012", new Vector3(-215f, 16.5f, 80f), Quaternion.Euler(0f, -30f, 0f));
+        cameraRecorder.AddCameraData("Avatar.011", new Vector3(-264f, 16.5f, 49f), Quaternion.Euler(0f, -30f, 0f));
+        cameraRecorder.AddCameraData("Avatar.009", new Vector3(-228f, 16.5f, -64f), Quaternion.Euler(0f, -150f, 0f));
   }
 
     private void Update()
