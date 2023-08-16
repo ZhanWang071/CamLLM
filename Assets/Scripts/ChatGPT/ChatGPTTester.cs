@@ -18,9 +18,12 @@ public class ChatGPTTester : MonoBehaviour
 
     [SerializeField] private RectTransform sent;
     [SerializeField] private RectTransform received;
+    
     public bool Voice = false;
     [SerializeField] private Text2Speech textToSpeech;
 
+    [SerializeField] private RectTransform InfoDisplay;
+    [SerializeField] private RectTransform Info;
 
 
   private float height;
@@ -31,18 +34,28 @@ public class ChatGPTTester : MonoBehaviour
 
     public GameObject Model;
 
+    private void Start()
+    {
+        //ShowChatbox();
+        HideChatbox();
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             AppendMessage("I really interested in chinese art.", "user");
             AppendMessage("That's great! Chinese art has a rich history and is known for its unique styles and techniques.\n In our virtual museum, we have several Chinese paintings that you might find interesting. Here are a few of them:\r\n\r\n1. \"Section of Goddess of Luo River\": This painting depicts a beautiful landscape with mountains, rivers, and trees. It showcases the traditional Chinese ink painting style.\r\n\r\n2. \"Travelers among Mountains and Streams\": This painting portrays a group of travelers navigating through a mountainous landscape. It is a classic example of Chinese landscape painting.\r\n\r\nThese are just a few examples of the Chinese art we have in our museum. If you would like to explore more, I can guide you to these paintings in the virtual space.", "assistant");
+            DisplayInfo("Welcome to the virtual museum! This museum is home to a diverse collection of paintings from various artists and periods. The museum aims to provide visitors with an immersive and educational experience.\r\n\r\nThe museum features a wide range of artworks, including famous masterpieces such as the \"Mona Lisa\" by Leonardo da Vinci, \"The Last Supper\" by Leonardo da Vinci, and \"The Scream\" by Edvard Munch. You can also explore other renowned works like \"The Birth of Venus\" by Sandro Botticelli, \"Guernica\" by Pablo Picasso, and \"The Great Wave\" by Katsushika Hokusai.\r\n\r\nThe museum is designed to replicate the experience of visiting a physical museum, allowing you to navigate through different exhibition halls and view the paintings up close. Each painting is carefully positioned and oriented to create an authentic and immersive environment.\r\n\r\nAs you explore the museum, you can learn more about each painting by interacting with information panels located near each artwork. These panels provide details about the artist, the painting's historical significance, and other interesting facts.\r\n\r\nFeel free to explore the museum at your own pace and enjoy the beauty and richness of the artworks on display. If you have any questions or need assistance during your visit, don't hesitate to ask. Enjoy your time at the virtual museum!");
         }
     }
 
     public void Execute(string input = "")
     {
         Debug.Log("Send the message");
+
+        DeleteChildren(InfoDisplay);
+
         if (string.IsNullOrEmpty(input)) {
             prompt = inputField.text;
         } else {
@@ -60,17 +73,76 @@ public class ChatGPTTester : MonoBehaviour
         StartCoroutine(ChatGPTClient.Instance.Ask(prompt, currentPosition, landmark, (r) => ProcessResponse(r)));
     }
 
+    [SerializeField] private GameObject Chatbox;
+    [SerializeField] private GameObject ChatboxButton;
+    private bool isChatboxShow = false;
+    public void HideChatbox()
+    {
+        if (Chatbox != null)
+        {
+            Chatbox.SetActive(false);
+            ChatboxButton.SetActive(true);
+
+            Vector3 currentPosition = ChatboxButton.transform.position;
+            currentPosition.y = 74.0f;
+            ChatboxButton.transform.position = currentPosition;
+
+            isChatboxShow = false;
+        }
+    }
+
+    public void ShowChatbox()
+    {
+        if (Chatbox != null)
+        {
+            Chatbox.SetActive(true);
+            //ChatboxButton.SetActive(false);
+
+            Vector3 currentPosition = ChatboxButton.transform.position;
+            currentPosition.y = 780.0f;
+            ChatboxButton.transform.position = currentPosition;
+
+            isChatboxShow = true;
+        }
+    }
+
+    public void ChatboxButtonClicked()
+    {
+        if (isChatboxShow)
+        {
+            HideChatbox();
+        }
+        else
+        {
+            ShowChatbox();
+        }
+    }
+
     public void ProcessResponse(ChatGPTResponse response)
     {
         //var chatGPTContent = response.Choices.FirstOrDefault()?.Message?.Content;
         var chatGPTContent = response.Content;
+        var ResponseTasks = response.Tasks;
 
         if (!string.IsNullOrEmpty(chatGPTContent))
         {
             AppendMessage(chatGPTContent, "assistant");
             Debug.Log("Response in voice...");
-            if (Voice) textToSpeech.MakeAudioRequest(chatGPTContent);
-            cameraController.ProcessChatGPTResponse(chatGPTContent);
+            HideChatbox();
+
+            if (ResponseTasks.Contains("information enhancement"))
+            {
+                DisplayInfo(chatGPTContent);
+            }
+
+            if (ResponseTasks.Contains("navigation"))
+            {
+                cameraController.ProcessChatGPTResponse(chatGPTContent, Voice, textToSpeech);
+            }
+            else
+            {
+                if (Voice) textToSpeech.MakeAudioRequest(chatGPTContent);
+            }
         }
         else
         {
@@ -94,4 +166,27 @@ public class ChatGPTTester : MonoBehaviour
         scroll.verticalNormalizedPosition = 0;
     }
 
+    private void DisplayInfo(string prompt)
+    {
+        var item = Instantiate(Info, InfoDisplay);
+        item.GetChild(0).GetChild(0).GetComponent<Text>().text = "More Information";
+        item.GetChild(0).GetChild(1).GetChild(0).GetComponent<Text>().text = prompt;
+        LayoutRebuilder.ForceRebuildLayoutImmediate(item);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(item);
+    }
+
+
+    private void DeleteChildren(RectTransform parentRectTransform)
+    {
+        // Check if the parent RectTransform is not null
+        if (parentRectTransform != null)
+        {
+            // Loop through all children of the parent RectTransform
+            for (int i = parentRectTransform.childCount - 1; i >= 0; i--)
+            {
+                // Destroy the child GameObject
+                Destroy(parentRectTransform.GetChild(i).gameObject);
+            }
+        }
+    }
 }

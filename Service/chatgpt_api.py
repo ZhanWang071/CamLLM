@@ -1,10 +1,11 @@
 import openai
-from museum import data
+from museum import data_spatial
 import json
 import math
 import museum
 import prompts
 import copy
+import re
 
 openai.api_key = "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"
 
@@ -15,13 +16,11 @@ def gpt_guidance(request):
     question = request["question"]
     position = string_to_position(request["position"])
     if (len(request["landmark"])):
-        landmark = data["paintings"][request["landmark"]]["name"]
+        landmark = data_spatial["paintings"][request["landmark"]]["name"]
     else:
         landmark = request["landmark"]
 
     messages.append({"role": "user", "content": question})
-
-    print(messages)
 
     tasks = task_classify(question)
     print("Task Classification: " + str(tasks))
@@ -32,11 +31,13 @@ def gpt_guidance(request):
         response = gpt_preference(question)
     if "navigation" in tasks:
         response = gpt_navigation(question, position, landmark)
+    if "error" in tasks:
+        response = gpt_error(question)
     
     messages.append({"role": "assistant", "content": response})
-    print(messages)
+    # print(messages)
 
-    return response
+    return [tasks, response]
 
 """Step 1: classify the user question into which kinds of interaction tasks
 """
@@ -69,7 +70,7 @@ Step 2: According classification results, assign the task into the corresponsdin
 
 # TODO: We need to differentiate the tour and direct search
 def gpt_navigation(question, position, landmark,model="gpt-3.5-turbo"):
-    print("Navigation: ")
+    print("Response for Navigation: ")
 
     # remember the history conversation and give the response
     navigation_messages = copy.deepcopy(messages)
@@ -80,14 +81,26 @@ def gpt_navigation(question, position, landmark,model="gpt-3.5-turbo"):
         messages=navigation_messages,
         temperature=0,
     )
-    result = response.choices[0].message["content"] 
+    result = response.choices[0].message["content"]
+    result = extract_json_part(result)
     print(result)
     result_ordered = reorder_landmarks(result, position)
 
     return result_ordered
 
+def extract_json_part(input_string):
+    pattern = r'{[^{}]*}'
+
+    match = re.search(pattern, input_string)
+
+    if match:
+        json_like_part = match.group()
+        return json_like_part
+    else:
+        return None
+
 def gpt_information(question, position, landmark, model="gpt-3.5-turbo"):
-    print("Information Enhancement: ")
+    print("Response for Information Enhancement: ")
     if (len(landmark)):
         messages[-1]["content"] = "Now I am looking at the painting " + str(landmark) + ". " + question
     else:
@@ -105,7 +118,19 @@ def gpt_information(question, position, landmark, model="gpt-3.5-turbo"):
 
 # TODO: Analysis user preference and give some natural response
 def gpt_preference(question, model="gpt-3.5-turbo"):
-    print("User Preference: ")
+    print("Response for User Preference: ")
+
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=messages,
+        temperature=0,
+    )
+    result = response.choices[0].message["content"]
+    print(result)
+    return result
+
+def gpt_error(question, model="gpt-3.5-turbo"):
+    print("Response for Error: ")
 
     response = openai.ChatCompletion.create(
         model=model,
@@ -128,7 +153,7 @@ def reorder_landmarks(result, start_position):
     tour_data = json.loads(result)
     tour_names = tour_data["Tour"]
     tour_ids = tour_data["TourID"]
-    tour_positions = [data["paintings"][tour_id]["position"] for tour_id in tour_ids]
+    tour_positions = [data_spatial["paintings"][tour_id]["position"] for tour_id in tour_ids]
 
     num_landmarks = len(tour_positions)
 
