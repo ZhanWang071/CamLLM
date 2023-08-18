@@ -35,7 +35,7 @@ public class CameraController : MonoBehaviour
     private float rotationDistance;
     private float rotationSpeed = 30f;
 
-    private WaitForSeconds wait = new WaitForSeconds(5f);
+    private WaitForSeconds wait = new WaitForSeconds(2f);
 
     private string Landmark = "";
 
@@ -58,13 +58,13 @@ public class CameraController : MonoBehaviour
 
         // Perform initial camera setup
         initalPosition = cameraTransform.position;
-        initalRotation = cameraTransform.rotation;
+        initalRotation = cameraTransform.localRotation;
 
         startPosition = cameraTransform.position;
-        startRotation = cameraTransform.rotation;
+        startRotation = cameraTransform.localRotation;
 
         targetPosition = cameraTransform.position;
-        targetRotation = cameraTransform.rotation;
+        targetRotation = cameraTransform.localRotation;
 
         // Ensure that the camera starts in a valid NavMesh area
         SetCameraToNearestNavMeshPosition();
@@ -276,10 +276,17 @@ public class CameraController : MonoBehaviour
         }
     }
 
+    private bool rotating = false;
     private void RotateTowardsDestination()
     {
         if (navMeshAgent.remainingDistance < rotationStartDistance)
         {
+            if (!rotating)
+            {
+                var rotateAngle = Quaternion.Angle(cameraTransform.rotation, targetRotation);
+                rotationSpeed = Mathf.Min(50f, rotateAngle / navMeshAgent.remainingDistance * navMeshAgent.speed);
+            }
+            rotating = true;
             if (Quaternion.Angle(cameraTransform.rotation, targetRotation) > 0.1f)
             {
                 navMeshAgent.updateRotation = false;
@@ -288,11 +295,13 @@ public class CameraController : MonoBehaviour
         }
         else
         {
-            navMeshAgent.updateRotation = true;
+            rotating = false;
+            rotationSpeed = 30f;
             if (Quaternion.Angle(cameraTransform.localRotation, Quaternion.identity) > 0.1f)
             {
                 cameraTransform.localRotation = Quaternion.RotateTowards(cameraTransform.localRotation, Quaternion.identity, rotationSpeed * Time.deltaTime);
             }
+            navMeshAgent.updateRotation = true;
         }
     }
 
@@ -308,8 +317,6 @@ public class CameraController : MonoBehaviour
             //    Debug.Log(path.corners[i]);
             //}
             // Instantiate the arrow prefab at the calculated position
-            Debug.Log("2222");
-            Debug.Log(path.corners.Length);
             arrow = Instantiate(arrowPrefab, Vector3.Lerp(path.corners[0], path.corners[1], 0.8f), Quaternion.identity);
             Vector3 arrowPosition = arrow.transform.position;
             arrowPosition.y = 6.0f;
