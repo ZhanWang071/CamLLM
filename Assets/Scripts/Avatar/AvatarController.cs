@@ -13,6 +13,7 @@ public class AvatarController : MonoBehaviour {
     private Transform avatarTransform;
     private static Vector3 targetPosition;
     private static Quaternion targetRotation;
+    private static Vector3 targetCameraPosition;
 
     [SerializeField] private NavMeshAgent navMeshAgent;
 
@@ -56,43 +57,44 @@ public class AvatarController : MonoBehaviour {
         StartCoroutine(NavigationTour(tourIDs));
     }
 
-    private float waitTime = 1f;
+    // private float waitTime = 1f;
     private float rotationSpeed = 200f;
 
     private IEnumerator NavigationTour(string[] tourIDs) {
         for (int i = 0; i < tourIDs.Length; i++) {
-            // update Avatar target positions and orientations
+            // update avatar target positions and orientations
             UpdateTargetAvatar(tourIDs[i]);
             animator.SetBool("Walk", true);
             navMeshAgent.SetDestination(targetPosition);
 
-            // Wait until the camera reaches the painting
+            // Wait until the avatar reaches the painting
             while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance) {
                 yield return null;
             }
             animator.SetBool("Walk", false);
 
-            // After the camera reaches the target painting, rotate the camera smoothly
-            while (Quaternion.Angle(avatarTransform.rotation, targetRotation) > 0.1f)
-            {
+            // After the camera reaches the target painting, rotate to the camera smoothly
+            do {
+                targetRotation = Quaternion.LookRotation(
+                    new Vector3(targetCameraPosition.x - transform.position.x, 0, targetCameraPosition.z - transform.position.z)
+                );
                 avatarTransform.rotation = Quaternion.RotateTowards(avatarTransform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
                 yield return null;
-            }
+            } while (Quaternion.Angle(avatarTransform.rotation, targetRotation) > 0.1f);
 
             OnAvatarReached?.Invoke();
             yield return new WaitUntil(() => canContinue);
             canContinue = false;
-
-            // Wait at the current position
-            yield return new WaitForSeconds(waitTime);
         }
     }
 
     private void UpdateTargetAvatar(string tourID) {
-        string cameraID = tourID.Replace("painting ", "Avatar.");
+        string avatarID = tourID.Replace("painting ", "Avatar.");
+        string cameraID = tourID.Replace("painting ", "Camera.");
+        
 
-        targetPosition = cameraRecorder.GetCameraPosition(cameraID);
-        targetRotation = cameraRecorder.GetCameraOrientation(cameraID);
+        targetPosition = cameraRecorder.GetCameraPosition(avatarID);
+        targetCameraPosition = cameraRecorder.GetCameraPosition(cameraID);
     }
 
 }

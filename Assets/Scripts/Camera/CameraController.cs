@@ -278,13 +278,14 @@ public class CameraController : MonoBehaviour
             navMeshAgent.SetDestination(targetPosition);
             CalculateNavPath(targetPosition);
 
-            yield return new WaitUntil(() => canContinue);
-
             // Wait until the camera reaches the painting
             while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
             {
                 yield return null;
             }
+
+            yield return new WaitUntil(() => canContinue);
+            canContinue = false;
 
             // After the camera reaches the target painting, rotate the camera smoothly
             while (Quaternion.Angle(cameraTransform.rotation, targetRotation) > 0.1f)
@@ -293,7 +294,6 @@ public class CameraController : MonoBehaviour
                 yield return null;
             }
 
-            canContinue = false;
             OnCameraReached?.Invoke();
 
             // Wait at the current position
