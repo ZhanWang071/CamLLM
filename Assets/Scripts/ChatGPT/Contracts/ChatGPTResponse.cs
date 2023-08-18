@@ -27,6 +27,9 @@ public class ChatGPTResponse
 
     [JsonProperty("tasks")]
     public List<string> Tasks { get; set; }
+
+    [JsonProperty("context")]
+    public string Context { get; set; }
 }
 
 public class ChatGPTMessage

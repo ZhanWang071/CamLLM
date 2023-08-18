@@ -27,3 +27,9 @@ navigation
 preference_prompt = """
 
 """
+
+# extract contextual info for display
+extract_prompt = """
+Extract the context in 4-8 sentences and use a clear way such as bulleted points to display the information below directly:
+[Information]: 
+"""

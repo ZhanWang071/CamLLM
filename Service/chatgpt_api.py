@@ -25,8 +25,10 @@ def gpt_guidance(request):
     tasks = task_classify(question)
     print("Task Classification: " + str(tasks))
 
+    response = ""
+    context = ""
     if "information enhancement" in tasks:
-        response = gpt_information(question, position, landmark)
+        response, context = gpt_information(question, position, landmark)
     if "preference specification" in tasks:
         response = gpt_preference(question)
     if "navigation" in tasks:
@@ -37,7 +39,7 @@ def gpt_guidance(request):
     messages.append({"role": "assistant", "content": response})
     # print(messages)
 
-    return [tasks, response]
+    return [tasks, response, context]
 
 """Step 1: classify the user question into which kinds of interaction tasks
 """
@@ -114,7 +116,20 @@ def gpt_information(question, position, landmark, model="gpt-3.5-turbo"):
 
     result = response.choices[0].message["content"]
     print(result)
-    return result
+
+    result_context = extract_info(result)
+    return result, result_context
+
+def extract_info(question, model="gpt-3.5-turbo"):
+    messages = [{"role": "system", "content": "You are a helpful assistant."},{"role": "user", "content": prompts.extract_prompt + question}]
+
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=messages,
+        temperature=0,
+    )
+
+    return response.choices[0].message["content"]
 
 # TODO: Analysis user preference and give some natural response
 def gpt_preference(question, model="gpt-3.5-turbo"):
