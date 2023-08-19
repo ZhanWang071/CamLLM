@@ -34,6 +34,19 @@ public class CameraController : MonoBehaviour
     public string[] tourIDs;
 
     public NavMeshAgent navMeshAgent;
+    private bool navigating;
+
+    private float rotationStartDistance = 50f;
+    private float rotationDistance;
+    private float rotationSpeed = 30f;
+
+    private WaitForSeconds wait = new WaitForSeconds(2f);
+
+    private string Landmark = "";
+
+    [SerializeField] private GameObject arrowPrefab;
+    private GameObject arrow;
+    private float arrowSpeed = 5f;
 
     private void Start()
     {
@@ -50,13 +63,13 @@ public class CameraController : MonoBehaviour
 
         // Perform initial camera setup
         initalPosition = cameraTransform.position;
-        initalRotation = cameraTransform.rotation;
+        initalRotation = cameraTransform.localRotation;
 
         startPosition = cameraTransform.position;
-        startRotation = cameraTransform.rotation;
+        startRotation = cameraTransform.localRotation;
 
         targetPosition = cameraTransform.position;
-        targetRotation = cameraTransform.rotation;
+        targetRotation = cameraTransform.localRotation;
 
         // Ensure that the camera starts in a valid NavMesh area
         SetCameraToNearestNavMeshPosition();
@@ -83,7 +96,9 @@ public class CameraController : MonoBehaviour
         if (navigating)
         {
             MoveArrow();
+            RotateTowardsDestination();
         }
+
     }
 
     private void Test()
@@ -178,13 +193,9 @@ public class CameraController : MonoBehaviour
     {
         // If there are no landmarks to visit, return
         if (tourIDs.Length <= 1)
-            //yield break;
             return;
 
-        // Create a new list to store the reordered IDs
         List<string> reorderedTourIDs = new List<string>();
-
-        // Start from the camera's current position as the initial position
         Vector3 currentPosition = cameraTransform.position;
 
         // Find the closest landmark and add it to the reordered list
@@ -193,16 +204,11 @@ public class CameraController : MonoBehaviour
             string closestLandmarkID = FindClosestLandmark(currentPosition);
             reorderedTourIDs.Add(closestLandmarkID);
 
-            // Remove the selected landmark from the original array
             tourIDs = RemoveElementFromArray(tourIDs, closestLandmarkID);
 
-            // Update the current position to the selected landmark's position
             currentPosition = GetPositionFromTourID(closestLandmarkID);
-
-            //yield return null;
         }
 
-        // Update the tourIDs with the reordered list
         tourIDs = reorderedTourIDs.ToArray();
 
         Debug.Log("Reorder finished");
@@ -241,6 +247,7 @@ public class CameraController : MonoBehaviour
     public void PlayButtonClicked()
     {
         Debug.Log("Replay the camera");
+
         cameraTransform.position = initalPosition;
         cameraTransform.rotation = initalRotation;
 
@@ -261,22 +268,21 @@ public class CameraController : MonoBehaviour
         return cameraRecorder.GetCameraPosition(cameraID);
     }
 
-    private float waitTime = 1f;
-    private float rotationSpeed = 30f;
-
-    private string Landmark = "";
 
     private IEnumerator NavigationTour(string[] tourIDs)
     {
-
+        NavMeshPath path = new NavMeshPath();
         for (int i = 0; i < tourIDs.Length; i++)
         {
             Landmark = tourIDs[i];
             Debug.Log(tourIDs[i]);
+
             // update camera target positions and orientations
             UpdateTargetCamera(tourIDs[i]);
             navMeshAgent.SetDestination(targetPosition);
-            CalculateNavPath(targetPosition);
+
+            NavMesh.CalculatePath(cameraTransform.position, targetPosition, NavMesh.AllAreas, path);
+            DrawArrow(path);
 
             // Wait until the camera reaches the painting
             while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
@@ -286,57 +292,54 @@ public class CameraController : MonoBehaviour
 
             yield return new WaitUntil(() => canContinue);
             canContinue = false;
-
-            // After the camera reaches the target painting, rotate the camera smoothly
-            while (Quaternion.Angle(cameraTransform.rotation, targetRotation) > 0.1f)
-            {
-                cameraTransform.rotation = Quaternion.RotateTowards(cameraTransform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-                yield return null;
-            }
-
             OnCameraReached?.Invoke();
 
-            // Wait at the current position
-            yield return new WaitForSeconds(waitTime);
+            yield return wait;
         }
     }
 
-    private IEnumerator NavigationSingle(string tourID)
+    private bool rotating = false;
+    private void RotateTowardsDestination()
     {
-        Landmark = tourID;
-        UpdateTargetCamera(tourID);
-        navMeshAgent.SetDestination(targetPosition);
-        CalculateNavPath(targetPosition);
-
-        // Wait until the camera reaches the painting
-        while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+        if (navMeshAgent.remainingDistance < rotationStartDistance)
         {
-            yield return null;
+            if (!rotating)
+            {
+                var rotateAngle = Quaternion.Angle(cameraTransform.rotation, targetRotation);
+                rotationSpeed = Mathf.Min(50f, rotateAngle / navMeshAgent.remainingDistance * navMeshAgent.speed);
+            }
+            rotating = true;
+            if (Quaternion.Angle(cameraTransform.rotation, targetRotation) > 0.1f)
+            {
+                navMeshAgent.updateRotation = false;
+                cameraTransform.rotation = Quaternion.RotateTowards(cameraTransform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            }
         }
-
-        // After the camera reaches the target painting, rotate the camera smoothly
-        while (Quaternion.Angle(cameraTransform.rotation, targetRotation) > 0.1f)
+        else
         {
-            cameraTransform.rotation = Quaternion.RotateTowards(cameraTransform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-            yield return null;
+            rotating = false;
+            rotationSpeed = 30f;
+            if (Quaternion.Angle(cameraTransform.localRotation, Quaternion.identity) > 0.1f)
+            {
+                cameraTransform.localRotation = Quaternion.RotateTowards(cameraTransform.localRotation, Quaternion.identity, rotationSpeed * Time.deltaTime);
+            }
+            navMeshAgent.updateRotation = true;
         }
-
-        yield return null;
     }
 
-    [SerializeField] private GameObject arrowPrefab;
-    private bool navigating;
-    private GameObject arrow;
 
-    private void CalculateNavPath(Vector3 targetPosition)
+    //TODO: arrow list, add more arrows for longer path
+    private void DrawArrow(NavMeshPath path)
     {
-        NavMeshPath path = new NavMeshPath();
-        if (NavMesh.CalculatePath(cameraTransform.position, targetPosition, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete)
+        if (path.status == NavMeshPathStatus.PathComplete)
         {
             navigating = true;
-
+            //for (int i = 0; i < path.corners.Length; i++)
+            //{
+            //    Debug.Log(path.corners[i]);
+            //}
             // Instantiate the arrow prefab at the calculated position
-            arrow = Instantiate(arrowPrefab, path.corners[1], Quaternion.identity);
+            arrow = Instantiate(arrowPrefab, Vector3.Lerp(path.corners[0], path.corners[1], 0.8f), Quaternion.identity);
             Vector3 arrowPosition = arrow.transform.position;
             arrowPosition.y = 6.0f;
             arrow.transform.position = arrowPosition;
@@ -356,7 +359,6 @@ public class CameraController : MonoBehaviour
         return distance;
     }
 
-    private float arrowSpeed = 5f;
     private void MoveArrow()
     {
         if (arrow != null)

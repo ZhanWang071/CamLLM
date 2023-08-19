@@ -18,7 +18,7 @@ public class ChatGPTTester : MonoBehaviour
 
     [SerializeField] private RectTransform sent;
     [SerializeField] private RectTransform received;
-    
+
     public bool Voice = false;
     [SerializeField] private Text2Speech textToSpeech;
 
@@ -46,7 +46,8 @@ public class ChatGPTTester : MonoBehaviour
         {
             AppendMessage("I really interested in chinese art.", "user");
             AppendMessage("That's great! Chinese art has a rich history and is known for its unique styles and techniques.\n In our virtual museum, we have several Chinese paintings that you might find interesting. Here are a few of them:\r\n\r\n1. \"Section of Goddess of Luo River\": This painting depicts a beautiful landscape with mountains, rivers, and trees. It showcases the traditional Chinese ink painting style.\r\n\r\n2. \"Travelers among Mountains and Streams\": This painting portrays a group of travelers navigating through a mountainous landscape. It is a classic example of Chinese landscape painting.\r\n\r\nThese are just a few examples of the Chinese art we have in our museum. If you would like to explore more, I can guide you to these paintings in the virtual space.", "assistant");
-            DisplayInfo("Welcome to the virtual museum! This museum is home to a diverse collection of paintings from various artists and periods. The museum aims to provide visitors with an immersive and educational experience.\r\n\r\nThe museum features a wide range of artworks, including famous masterpieces such as the \"Mona Lisa\" by Leonardo da Vinci, \"The Last Supper\" by Leonardo da Vinci, and \"The Scream\" by Edvard Munch. You can also explore other renowned works like \"The Birth of Venus\" by Sandro Botticelli, \"Guernica\" by Pablo Picasso, and \"The Great Wave\" by Katsushika Hokusai.\r\n\r\nThe museum is designed to replicate the experience of visiting a physical museum, allowing you to navigate through different exhibition halls and view the paintings up close. Each painting is carefully positioned and oriented to create an authentic and immersive environment.\r\n\r\nAs you explore the museum, you can learn more about each painting by interacting with information panels located near each artwork. These panels provide details about the artist, the painting's historical significance, and other interesting facts.\r\n\r\nFeel free to explore the museum at your own pace and enjoy the beauty and richness of the artworks on display. If you have any questions or need assistance during your visit, don't hesitate to ask. Enjoy your time at the virtual museum!");
+            DisplayInfo("To determine the three most popular paintings in the museum, I would need access to the popularity data of each painting. Unfortunately, the popularity information is not provided in the given data. However, I can provide you with a list of the top three most famous paintings in general:\r\n\r\n1. \"Mona Lisa\" by Leonardo da Vinci\r\n2. \"The Last Supper\" by Leonardo da Vinci\r\n3. \"The Scream\" by Edvard Munch\r\n\r\nThese paintings are widely recognized and highly regarded in the art world.");
+            //DisplayInfo("Welcome to the virtual museum! This museum is home to a diverse collection of paintings from various artists and periods. The museum aims to provide visitors with an immersive and educational experience.\r\n\r\nThe museum features a wide range of artworks, including famous masterpieces such as the \"Mona Lisa\" by Leonardo da Vinci");
         }
     }
 
@@ -56,9 +57,12 @@ public class ChatGPTTester : MonoBehaviour
 
         DeleteChildren(InfoDisplay);
 
-        if (string.IsNullOrEmpty(input)) {
+        if (string.IsNullOrEmpty(input))
+        {
             prompt = inputField.text;
-        } else {
+        }
+        else
+        {
             prompt = input;
         }
         AppendMessage(prompt, "user");
@@ -99,7 +103,7 @@ public class ChatGPTTester : MonoBehaviour
             //ChatboxButton.SetActive(false);
 
             Vector3 currentPosition = ChatboxButton.transform.position;
-            currentPosition.y = 780.0f;
+            currentPosition.y = 834.0f;
             ChatboxButton.transform.position = currentPosition;
 
             isChatboxShow = true;
@@ -123,6 +127,7 @@ public class ChatGPTTester : MonoBehaviour
         //var chatGPTContent = response.Choices.FirstOrDefault()?.Message?.Content;
         var chatGPTContent = response.Content;
         var ResponseTasks = response.Tasks;
+        var ResponseContext = response.Context;
 
         if (!string.IsNullOrEmpty(chatGPTContent))
         {
@@ -132,7 +137,7 @@ public class ChatGPTTester : MonoBehaviour
 
             if (ResponseTasks.Contains("information enhancement"))
             {
-                DisplayInfo(chatGPTContent);
+                DisplayInfo(ResponseContext);
             }
 
             if (ResponseTasks.Contains("navigation"))
@@ -166,13 +171,17 @@ public class ChatGPTTester : MonoBehaviour
         scroll.verticalNormalizedPosition = 0;
     }
 
+    [SerializeField] private RectTransform uiElement;
     private void DisplayInfo(string prompt)
     {
         var item = Instantiate(Info, InfoDisplay);
         item.GetChild(0).GetChild(0).GetComponent<Text>().text = "More Information";
         item.GetChild(0).GetChild(1).GetChild(0).GetComponent<Text>().text = prompt;
         LayoutRebuilder.ForceRebuildLayoutImmediate(item);
-        LayoutRebuilder.ForceRebuildLayoutImmediate(item);
+
+        // position the information at the center of the info display canvas
+        float topY = uiElement.rect.height / 2 - item.rect.height / 2;
+        item.anchoredPosition = new Vector2(0f, -topY);
     }
 
 
