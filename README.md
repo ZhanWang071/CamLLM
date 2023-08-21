@@ -3,7 +3,6 @@
 - To Activate Virtual Environment: 
     - (On Windows) .\chatgpt_env\Scripts\activate.bat
     - (On Mac or Linux) source tutorial-env/bin/activate
-- .\chatgpt_env\Scripts\activate.bat
 - To Install Requirements.txt: pip install -r requirements.txt
 - To run service: python ./chatgpt_service.py
 
