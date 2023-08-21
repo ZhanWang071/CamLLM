@@ -102,7 +102,7 @@ public class ChatGPTTester : MonoBehaviour
             //ChatboxButton.SetActive(false);
 
             Vector3 currentPosition = ChatboxButton.transform.position;
-            currentPosition.y = 834.0f;
+            currentPosition.y = 688.0f;
             ChatboxButton.transform.position = currentPosition;
 
             isChatboxShow = true;
@@ -173,8 +173,17 @@ public class ChatGPTTester : MonoBehaviour
     [SerializeField] private RectTransform uiElement;
     private void DisplayInfo(string prompt)
     {
+        string landmark = cameraController.GetCurrentLandmark();
+
         var item = Instantiate(Info, InfoDisplay);
-        item.GetChild(0).GetChild(0).GetComponent<Text>().text = "More Information";
+        if (landmark.Length > 0)
+        {
+            item.GetChild(0).GetChild(0).GetComponent<Text>().text = landmark;
+        }
+        else
+        {
+            item.GetChild(0).GetChild(0).GetComponent<Text>().text = "More Information";
+        }
         item.GetChild(0).GetChild(1).GetChild(0).GetComponent<Text>().text = prompt;
         LayoutRebuilder.ForceRebuildLayoutImmediate(item);
 

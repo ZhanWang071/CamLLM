@@ -281,10 +281,13 @@ public class CameraController : MonoBehaviour
 
     private IEnumerator NavigationTour(string[] tourIDs)
     {
+        navigating = true;
+
         playing = true;
         isOrNotPlaying();
 
         NavMeshPath path = new NavMeshPath();
+
         for (int i = 0; i < tourIDs.Length; i++)
         {
             while (!playing)
@@ -350,7 +353,6 @@ public class CameraController : MonoBehaviour
     {
         if (path.status == NavMeshPathStatus.PathComplete)
         {
-            navigating = true;
             //for (int i = 0; i < path.corners.Length; i++)
             //{
             //    Debug.Log(path.corners[i]);
