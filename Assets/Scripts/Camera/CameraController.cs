@@ -36,7 +36,7 @@ public class CameraController : MonoBehaviour
     private float rotationDistance;
     private float rotationSpeed = 30f;
 
-    private WaitForSeconds wait = new WaitForSeconds(2f);
+    private WaitForSeconds wait = new WaitForSeconds(1f);
 
     private string Landmark = "";
 
@@ -100,12 +100,12 @@ public class CameraController : MonoBehaviour
     private bool playing = false;
     [SerializeField] GameObject PlayButton;
     [SerializeField] GameObject PauseButton;
+    [SerializeField] Text TourButtonText;
 
     public void PlayButtonClicked()
     {
         playing = true;
-        PlayButton.SetActive(false);
-        PauseButton.SetActive(true);
+        isOrNotPlaying();
     }
 
     private void isOrNotPlaying()
@@ -114,11 +114,13 @@ public class CameraController : MonoBehaviour
         {
             PlayButton.SetActive(false);
             PauseButton.SetActive(true);
+            TourButtonText.text = "Touring";
         }
         else
         {
             PlayButton.SetActive(true);
             PauseButton.SetActive(false);
+            TourButtonText.text = "Continue Tour";
         }
     }
 

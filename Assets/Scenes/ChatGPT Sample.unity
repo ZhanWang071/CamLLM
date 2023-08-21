@@ -487,6 +487,7 @@ MonoBehaviour:
   arrowPrefab: {fileID: 151378, guid: 65b7898abf0d85948a13883d54443fe4, type: 3}
   PlayButton: {fileID: 2074038831}
   PauseButton: {fileID: 1082992951}
+  TourButtonText: {fileID: 110101405}
 --- !u!135 &212795752
 SphereCollider:
   m_ObjectHideFlags: 0
