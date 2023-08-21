@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.AI;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class CameraController : MonoBehaviour
 {
@@ -94,6 +95,31 @@ public class CameraController : MonoBehaviour
             RotateTowardsDestination();
         }
 
+    }
+
+    private bool playing = false;
+    [SerializeField] GameObject PlayButton;
+    [SerializeField] GameObject PauseButton;
+
+    public void PlayButtonClicked()
+    {
+        playing = true;
+        PlayButton.SetActive(false);
+        PauseButton.SetActive(true);
+    }
+
+    private void isOrNotPlaying()
+    {
+        if (playing)
+        {
+            PlayButton.SetActive(false);
+            PauseButton.SetActive(true);
+        }
+        else
+        {
+            PlayButton.SetActive(true);
+            PauseButton.SetActive(false);
+        }
     }
 
     private void Test()
@@ -226,15 +252,15 @@ public class CameraController : MonoBehaviour
         return list.ToArray();
     }
 
-    public void PlayButtonClicked()
-    {
-        Debug.Log("Replay the camera");
+    //public void PlayButtonClicked()
+    //{
+    //    Debug.Log("Replay the camera");
 
-        cameraTransform.position = initalPosition;
-        cameraTransform.rotation = initalRotation;
+    //    cameraTransform.position = initalPosition;
+    //    cameraTransform.rotation = initalRotation;
 
-        StartCoroutine(NavigationTour(tourIDs));
-    }
+    //    StartCoroutine(NavigationTour(tourIDs));
+    //}
 
     private void UpdateTargetCamera(string tourID)
     {
@@ -253,9 +279,17 @@ public class CameraController : MonoBehaviour
 
     private IEnumerator NavigationTour(string[] tourIDs)
     {
+        playing = true;
+        isOrNotPlaying();
+
         NavMeshPath path = new NavMeshPath();
         for (int i = 0; i < tourIDs.Length; i++)
         {
+            while (!playing)
+            {
+                yield return null;
+            }
+
             Landmark = tourIDs[i];
             Debug.Log(tourIDs[i]);
 
@@ -271,6 +305,9 @@ public class CameraController : MonoBehaviour
             {
                 yield return null;
             }
+
+            playing = false;
+            isOrNotPlaying();
 
             yield return wait;
         }
@@ -352,4 +389,6 @@ public class CameraController : MonoBehaviour
             }
         }
     }
+
+
 }
