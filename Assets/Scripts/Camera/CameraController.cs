@@ -23,6 +23,9 @@ public class CameraController : MonoBehaviour
     public static event Action OnCameraReached;
     private bool canContinue = false;
 
+    [SerializeField] private Animator animator;
+    private float currentRotationX = 0f;
+
     [System.Serializable]
     public class TourResponse
     {
@@ -59,7 +62,7 @@ public class CameraController : MonoBehaviour
             return;
         }
 
-        cameraTransform = mainCamera.transform;
+        cameraTransform = transform;
 
         // Perform initial camera setup
         initalPosition = cameraTransform.position;
@@ -70,6 +73,8 @@ public class CameraController : MonoBehaviour
 
         targetPosition = cameraTransform.position;
         targetRotation = cameraTransform.localRotation;
+
+        currentRotationX = cameraTransform.localEulerAngles.x;
 
         // Ensure that the camera starts in a valid NavMesh area
         SetCameraToNearestNavMeshPosition();
@@ -89,12 +94,17 @@ public class CameraController : MonoBehaviour
         }
     }
 
+    public float transitionSpeed = 1f;
+
     private void Update()
     {
         // Test camera movement
         Test();
         if (navigating)
         {
+            var targetRotationX = animator.GetBool("Walk") ? 60f : 0f;
+            currentRotationX = Mathf.Lerp(currentRotationX, targetRotationX,  transitionSpeed * Time.deltaTime);
+            mainCamera.transform.localEulerAngles = new Vector3(currentRotationX, 0f, 0f);
             MoveArrow();
             RotateTowardsDestination();
         }
@@ -284,11 +294,15 @@ public class CameraController : MonoBehaviour
             NavMesh.CalculatePath(cameraTransform.position, targetPosition, NavMesh.AllAreas, path);
             DrawArrow(path);
 
+            animator.SetBool("Walk", true);
+
             // Wait until the camera reaches the painting
             while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
             {
                 yield return null;
             }
+
+            animator.SetBool("Walk", false);
 
             yield return new WaitUntil(() => canContinue);
             canContinue = false;
