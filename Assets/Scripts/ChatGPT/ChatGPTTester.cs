@@ -49,6 +49,10 @@ public class ChatGPTTester : MonoBehaviour
             DisplayInfo("To determine the three most popular paintings in the museum, I would need access to the popularity data of each painting. Unfortunately, the popularity information is not provided in the given data. However, I can provide you with a list of the top three most famous paintings in general:\r\n\r\n1. \"Mona Lisa\" by Leonardo da Vinci\r\n2. \"The Last Supper\" by Leonardo da Vinci\r\n3. \"The Scream\" by Edvard Munch\r\n\r\nThese paintings are widely recognized and highly regarded in the art world.");
             //DisplayInfo("Welcome to the virtual museum! This museum is home to a diverse collection of paintings from various artists and periods. The museum aims to provide visitors with an immersive and educational experience.\r\n\r\nThe museum features a wide range of artworks, including famous masterpieces such as the \"Mona Lisa\" by Leonardo da Vinci");
         }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            HightlightDetails("painting 015");
+        }
     }
 
     public void Execute(string input = "")
@@ -180,6 +184,7 @@ public class ChatGPTTester : MonoBehaviour
         if (landmark.Length > 0)
         {
             item.GetChild(0).GetChild(0).GetComponent<Text>().text = landmark;
+            HightlightDetails(landmark);
         }
         else
         {
@@ -193,6 +198,51 @@ public class ChatGPTTester : MonoBehaviour
         item.anchoredPosition = new Vector2(0f, -topY);
     }
 
+    [SerializeField] private RectTransform HighlightDisplay;
+    [SerializeField] private RectTransform HighlightRect;
+    private void HightlightDetails(string landmark)
+    {
+        // Get highlighted areas from landmark "painting 001"
+        var coordinates = new List<List<float>>
+            {
+                new List<float> { -68f, 10f, -87f, -74.19f, 5.8f, -87f},
+                // Add more rectangles if needed
+            };
+
+        // for each area, instantiate the prefab "Highlight Rect" in the gameobject "hightlight display"
+        foreach (var area in coordinates)
+        {
+            // Calculate the size of the rectangle
+            float width = area[3] - area[0];
+            float height = area[4] - area[1];
+            Vector3 leftTopPos = Camera.main.WorldToScreenPoint(new Vector3(area[0], area[1], area[2]));
+            Vector3 rightBottomPos = Camera.main.WorldToScreenPoint(new Vector3(area[3], area[4], area[5]));
+
+            // Calculate the center of the rectangle
+            Vector3 center = new Vector3((area[0]+area[3])*0.5f, (area[1] + area[4]) * 0.5f, (area[2] + area[5]) * 0.5f);
+            Debug.Log(center);
+            // Convert world position to screen position
+            // center = Vector3.Lerp(leftTopPos, rightBottomPos, 0.5f);
+            // Vector3 screenPosition = center;
+            Vector3 screenPosition = Camera.main.WorldToScreenPoint(center);
+
+            // Instantiate the prefab "Highlight Rect" in the gameobject "highlight display"
+            var highlightRect = Instantiate(HighlightRect, HighlightDisplay);
+
+            // Set the position and size of the highlight rect
+            highlightRect.transform.position = screenPosition;
+
+            Debug.Log(screenPosition);
+
+            // Set the size of the highlight rect using width and height
+            RectTransform rectTransform = highlightRect.GetComponent<RectTransform>();
+
+            width = Mathf.Abs(rightBottomPos.x - leftTopPos.x);
+            height = Mathf.Abs(rightBottomPos.y - leftTopPos.y);
+
+            rectTransform.sizeDelta = new Vector2(width, height);
+        }
+    }
 
     private void DeleteChildren(RectTransform parentRectTransform)
     {
