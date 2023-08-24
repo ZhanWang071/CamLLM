@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.AI;
 using System.Collections.Generic;
 using System;
+using UnityEngine.UI;
 
 public class CameraController : MonoBehaviour
 {
@@ -43,7 +44,7 @@ public class CameraController : MonoBehaviour
     private float rotationDistance;
     private float rotationSpeed = 30f;
 
-    private WaitForSeconds wait = new WaitForSeconds(2f);
+    private WaitForSeconds wait = new WaitForSeconds(1f);
 
     private string Landmark = "";
 
@@ -109,6 +110,33 @@ public class CameraController : MonoBehaviour
             RotateTowardsDestination();
         }
 
+    }
+
+    private bool playing = false;
+    [SerializeField] GameObject PlayButton;
+    [SerializeField] GameObject PauseButton;
+    [SerializeField] Text TourButtonText;
+
+    public void PlayButtonClicked()
+    {
+        playing = true;
+        isOrNotPlaying();
+    }
+
+    private void isOrNotPlaying()
+    {
+        if (playing)
+        {
+            PlayButton.SetActive(false);
+            PauseButton.SetActive(true);
+            TourButtonText.text = "Touring";
+        }
+        else
+        {
+            PlayButton.SetActive(true);
+            PauseButton.SetActive(false);
+            TourButtonText.text = "Continue Tour";
+        }
     }
 
     private void Test()
@@ -254,15 +282,15 @@ public class CameraController : MonoBehaviour
         return list.ToArray();
     }
 
-    public void PlayButtonClicked()
-    {
-        Debug.Log("Replay the camera");
+    //public void PlayButtonClicked()
+    //{
+    //    Debug.Log("Replay the camera");
 
-        cameraTransform.position = initalPosition;
-        cameraTransform.rotation = initalRotation;
+    //    cameraTransform.position = initalPosition;
+    //    cameraTransform.rotation = initalRotation;
 
-        StartCoroutine(NavigationTour(tourIDs));
-    }
+    //    StartCoroutine(NavigationTour(tourIDs));
+    //}
 
     private void UpdateTargetCamera(string tourID)
     {
@@ -281,9 +309,20 @@ public class CameraController : MonoBehaviour
 
     private IEnumerator NavigationTour(string[] tourIDs)
     {
+        navigating = true;
+
+        playing = true;
+        isOrNotPlaying();
+
         NavMeshPath path = new NavMeshPath();
+
         for (int i = 0; i < tourIDs.Length; i++)
         {
+            while (!playing)
+            {
+                yield return null;
+            }
+
             Landmark = tourIDs[i];
             Debug.Log(tourIDs[i]);
 
@@ -307,6 +346,9 @@ public class CameraController : MonoBehaviour
             yield return new WaitUntil(() => canContinue);
             canContinue = false;
             OnCameraReached?.Invoke();
+
+            playing = false;
+            isOrNotPlaying();
 
             yield return wait;
         }
@@ -347,7 +389,6 @@ public class CameraController : MonoBehaviour
     {
         if (path.status == NavMeshPathStatus.PathComplete)
         {
-            navigating = true;
             //for (int i = 0; i < path.corners.Length; i++)
             //{
             //    Debug.Log(path.corners[i]);

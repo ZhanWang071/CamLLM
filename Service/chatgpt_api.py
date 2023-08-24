@@ -104,9 +104,9 @@ def extract_json_part(input_string):
 def gpt_information(question, position, landmark, model="gpt-3.5-turbo"):
     print("Response for Information Enhancement: ")
     if (len(landmark)):
-        messages[-1]["content"] = "Now I am looking at the painting " + str(landmark) + ". " + question
+        messages[-1]["content"] = "Now I am looking at the painting " + str(landmark) + ". " + question + "\n Response in less than 10 sentences. And give suggestions on what I should visit next"
     else:
-        messages[-1]["content"] = "Now I am standing at the position in the model: " + str(position) + ". " + question
+        messages[-1]["content"] = "Now I am standing at the position in the model: " + str(position) + ". " + question + "\n Response in less than 10 sentences. And give suggestions on what I should visit next"
 
     response = openai.ChatCompletion.create(
         model=model,

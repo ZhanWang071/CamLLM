@@ -30,6 +30,6 @@ preference_prompt = """
 
 # extract contextual info for display
 extract_prompt = """
-Extract the context in 4-8 sentences and use a clear way such as bulleted points to display the information below directly:
+Extract the context in 3-5 sentences and sometime you can use a clear way to display the information below directly such as bullet points if neccessary:
 [Information]: 
 """
