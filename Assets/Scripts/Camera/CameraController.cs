@@ -25,7 +25,7 @@ public class CameraController : MonoBehaviour
     private bool canContinue = false;
 
     [SerializeField] private Animator animator;
-    private float currentRotationX = 0f;
+    // private float currentRotationX = 0f;
 
     [System.Serializable]
     public class TourResponse
@@ -75,7 +75,7 @@ public class CameraController : MonoBehaviour
         targetPosition = cameraTransform.position;
         targetRotation = cameraTransform.localRotation;
 
-        currentRotationX = cameraTransform.localEulerAngles.x;
+        // currentRotationX = cameraTransform.localEulerAngles.x;
 
         // Ensure that the camera starts in a valid NavMesh area
         SetCameraToNearestNavMeshPosition();
@@ -95,7 +95,7 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    public float transitionSpeed = 1f;
+    // public float transitionSpeed = 1f;
 
     private void Update()
     {
@@ -103,16 +103,16 @@ public class CameraController : MonoBehaviour
         Test();
         if (navigating)
         {
-            var targetRotationX = animator.GetBool("Walk") ? 60f : 0f;
-            currentRotationX = Mathf.Lerp(currentRotationX, targetRotationX,  transitionSpeed * Time.deltaTime);
-            mainCamera.transform.localEulerAngles = new Vector3(currentRotationX, 0f, 0f);
+            // var targetRotationX = animator.GetBool("Walk") ? 60f : 0f;
+            // currentRotationX = Mathf.Lerp(currentRotationX, targetRotationX,  transitionSpeed * Time.deltaTime);
+            // mainCamera.transform.localEulerAngles = new Vector3(currentRotationX, 0f, 0f);
             MoveArrow();
             RotateTowardsDestination();
         }
 
     }
 
-    private bool playing = false;
+    public bool playing = false;
     [SerializeField] GameObject PlayButton;
     [SerializeField] GameObject PauseButton;
     [SerializeField] Text TourButtonText;

@@ -18,6 +18,7 @@ public class AvatarController : MonoBehaviour {
     [SerializeField] private NavMeshAgent navMeshAgent;
 
     [SerializeField] private Animator animator;
+    [SerializeField] private CameraController cameraController;
 
     private void Start() {
         avatarTransform = transform;
@@ -62,6 +63,10 @@ public class AvatarController : MonoBehaviour {
 
     private IEnumerator NavigationTour(string[] tourIDs) {
         for (int i = 0; i < tourIDs.Length; i++) {
+            while (!cameraController.playing) {
+                yield return null;
+            }
+
             // update avatar target positions and orientations
             UpdateTargetAvatar(tourIDs[i]);
             animator.SetBool("Walk", true);
