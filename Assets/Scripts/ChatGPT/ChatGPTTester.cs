@@ -53,6 +53,21 @@ public class ChatGPTTester : MonoBehaviour
         {
             HightlightDetails("painting 015");
         }
+
+        // X button: chat button
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            // Trigger the click event of the tour button
+            ChatboxButton.GetComponent<Button>().onClick.Invoke();
+        }
+
+        // A button: tour button
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            // Trigger the click event of the tour button
+            TourButton.GetComponent<Button>().onClick.Invoke();
+        }
+
     }
 
     public void Execute(string input = "")
@@ -83,6 +98,7 @@ public class ChatGPTTester : MonoBehaviour
 
     [SerializeField] private GameObject Chatbox;
     [SerializeField] private GameObject ChatboxButton;
+    [SerializeField] private GameObject TourButton;
     private bool isChatboxShow = false;
     public void HideChatbox()
     {
@@ -92,7 +108,7 @@ public class ChatGPTTester : MonoBehaviour
             ChatboxButton.SetActive(true);
 
             Vector3 currentPosition = ChatboxButton.transform.position;
-            currentPosition.y = 74.0f;
+            currentPosition.y = TourButton.transform.position.y;
             ChatboxButton.transform.position = currentPosition;
 
             isChatboxShow = false;
@@ -107,7 +123,7 @@ public class ChatGPTTester : MonoBehaviour
             //ChatboxButton.SetActive(false);
 
             Vector3 currentPosition = ChatboxButton.transform.position;
-            currentPosition.y = 688.0f;
+            currentPosition.y = Chatbox.transform.position.y + Chatbox.GetComponent<RectTransform>().sizeDelta.y;
             ChatboxButton.transform.position = currentPosition;
 
             isChatboxShow = true;
