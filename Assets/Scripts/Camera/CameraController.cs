@@ -110,12 +110,24 @@ public class CameraController : MonoBehaviour
             RotateTowardsDestination();
         }
 
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            Init();
+        }
     }
 
     public bool playing = false;
     [SerializeField] GameObject PlayButton;
     [SerializeField] GameObject PauseButton;
     [SerializeField] Text TourButtonText;
+
+    private void Init()
+    {
+        cameraTransform.position = initalPosition;
+        cameraTransform.localRotation = initalRotation;
+        navigating = false;
+    }
+
 
     public void PlayButtonClicked()
     {

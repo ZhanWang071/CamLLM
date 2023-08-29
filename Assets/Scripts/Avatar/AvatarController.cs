@@ -28,6 +28,15 @@ public class AvatarController : MonoBehaviour {
         SetCameraToNearestNavMeshPosition();
     }
 
+    private void Update() 
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            transform.position = avatarTransform.position;
+            transform.rotation = avatarTransform.rotation;
+        }
+    }
+
     private void SetCameraToNearestNavMeshPosition() {
         NavMeshHit hit;
         if (NavMesh.SamplePosition(avatarTransform.position, out hit, 20f, NavMesh.AllAreas)) {

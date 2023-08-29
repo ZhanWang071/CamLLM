@@ -78,7 +78,7 @@ data_spatial = {
             "orientation": (270.0, 0.0, 210.0)
         },
         "painting 015": {
-            "name": "Detail of Figure in a Splashed-Ink Landscape",
+            "name": "Li River in a Splashed-Ink Landscape",
             "position": (15.16, 2.0, -17.32),
             "orientation": (270.0, 0.0, 270.0)
         },
@@ -223,7 +223,7 @@ data = {
             "name": "A woodcut",
         },
         "painting 015": {
-            "name": "Detail of Figure in a Splashed-Ink Landscape",
+            "name": "Li River in a Splashed-Ink Landscape",
         },
         "painting 016": {
             "name": "DasUndbild",
@@ -253,31 +253,31 @@ data = {
             "name": "Krishna_and_Radha",
         },
         "painting 025": {
-            "name": "Khan_Bahadur_Khan_with_men_of_his_clan",
+            "name": "Khan Bahadur Khan with men of his clan",
         },
         "painting 026": {
-            "name": "Emperor_Jahangir_At_The_Jharoka_Window_Of_The_Agra_Fort",
+            "name": "Emperor Jahangir At The Jharoka Window Of The Agra Fort",
         },
         "painting 027": {
-            "name": "Nauroz_durbar_of_Jahangir_(left_half)",
+            "name": "Nauroz durbar of Jahangir (left half)",
         },
         "painting 028": {
-            "name": "MET_DP156677",
+            "name": "Pichhwai for the Festival of Cows",
         },
         "painting 029": {
-            "name": "Flowers_in_a_Green_Vase_by_Leon_Dabo",
+            "name": "Flowers in a Green Vase by Leon Dabo",
         },
         "painting 030": {
-            "name": "Study_of_Flesh_Color_and_Gold",
+            "name": "Study of Flesh Color and Gold",
         },
         "painting 031": {
-            "name": "Whistler_James_Venetian_Scene_1879",
+            "name": "Whistler James Venetian Scene 1879",
         },
         "painting 032": {
             "name": "Louis15",
         },
         "painting 033": {
-            "name": "Chardin_pastel_selfportrait",
+            "name": "Chardin pastel selfportrait",
         },
     }
 }
