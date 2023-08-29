@@ -96,7 +96,7 @@ public class CameraController : MonoBehaviour
     }
 
     // public float transitionSpeed = 1f;
-
+    [SerializeField] private bool init = false;
     private void Update()
     {
         // Test camera movement
@@ -112,8 +112,10 @@ public class CameraController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha0))
         {
-            Init();
+            init = true;
         }
+
+        if (init) Init();
     }
 
     public bool playing = false;
@@ -126,6 +128,7 @@ public class CameraController : MonoBehaviour
         cameraTransform.position = initalPosition;
         cameraTransform.localRotation = initalRotation;
         navigating = false;
+        navMeshAgent.SetDestination(initalPosition);
     }
 
 
@@ -158,17 +161,25 @@ public class CameraController : MonoBehaviour
             string chatGPTContent = "{\n    \"Reasoning\": \"The visitor has a special interest in Chinese art, show him more related paintings.\",\n    \"Tour\": [\n        \"Guernica\",\n        \"The Birth of Venus\",\n        \"The Scream\",\n        \"The Great Wave off Kanagawa\",\n        \"The Persistence of Memory\",\n        \"The Last Judgment\",\n        \"The Creation of Adam\",\n        \"The Starry Night\"\n    ],\n    \"TourID\": [\n        \"painting 015\",\n        \"painting 013\",\n        \"painting 014\",\n        \"painting 008\",\n        \"painting 010\",\n        \"painting 012\",\n        \"painting 011\",\n        \"painting 009\"\n    ]\n}";
             ProcessChatGPTResponse(chatGPTContent);
         }
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            string chatGPTContent = "{\n    \"Reasoning\": \"The visitor has a special interest in Chinese art, show him more related paintings.\",\n    \"Tour\": [\n        \"Guernica\",\n        \"The Birth of Venus\",\n        \"The Scream\",\n        \"The Great Wave off Kanagawa\",\n        \"The Persistence of Memory\",\n        \"The Last Judgment\",\n        \"The Creation of Adam\",\n        \"The Starry Night\"\n    ],\n    \"TourID\": [\n        \"painting 009\"\n ]\n}";
+            ProcessChatGPTResponse(chatGPTContent);
+        }
     }
 
-    private void OnEnable() {
+    private void OnEnable()
+    {
         AvatarController.OnAvatarReached += HandleAvatarReached;
     }
 
-    private void OnDisable() {
+    private void OnDisable()
+    {
         AvatarController.OnAvatarReached -= HandleAvatarReached;
     }
 
-    private void HandleAvatarReached() {
+    private void HandleAvatarReached()
+    {
         canContinue = true;
     }
 
@@ -321,49 +332,56 @@ public class CameraController : MonoBehaviour
 
     private IEnumerator NavigationTour(string[] tourIDs)
     {
-        navigating = true;
-
-        playing = true;
-        isOrNotPlaying();
-
-        NavMeshPath path = new NavMeshPath();
-
-        for (int i = 0; i < tourIDs.Length; i++)
+        while (!init)
         {
-            while (!playing)
-            {
-                yield return null;
-            }
+            navigating = true;
 
-            Landmark = tourIDs[i];
-            Debug.Log(tourIDs[i]);
-
-            // update camera target positions and orientations
-            UpdateTargetCamera(tourIDs[i]);
-            navMeshAgent.SetDestination(targetPosition);
-
-            NavMesh.CalculatePath(cameraTransform.position, targetPosition, NavMesh.AllAreas, path);
-            DrawArrow(path);
-
-            animator.SetBool("Walk", true);
-
-            // Wait until the camera reaches the painting
-            while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
-            {
-                yield return null;
-            }
-
-            animator.SetBool("Walk", false);
-
-            yield return new WaitUntil(() => canContinue);
-            canContinue = false;
-            OnCameraReached?.Invoke();
-
-            playing = false;
+            playing = true;
             isOrNotPlaying();
 
-            yield return wait;
+            NavMeshPath path = new NavMeshPath();
+
+            for (int i = 0; i < tourIDs.Length; i++)
+            {
+
+                while (!playing)
+                {
+                    yield return null;
+                }
+
+                Landmark = tourIDs[i];
+                Debug.Log(tourIDs[i]);
+
+                // update camera target positions and orientations
+                UpdateTargetCamera(tourIDs[i]);
+                navMeshAgent.SetDestination(targetPosition);
+
+                NavMesh.CalculatePath(cameraTransform.position, targetPosition, NavMesh.AllAreas, path);
+                DrawArrow(path);
+
+                animator.SetBool("Walk", true);
+
+                // Wait until the camera reaches the painting
+                while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+                {
+                    yield return null;
+                }
+
+                animator.SetBool("Walk", false);
+
+                yield return new WaitUntil(() => canContinue);
+                canContinue = false;
+                OnCameraReached?.Invoke();
+
+                playing = false;
+                isOrNotPlaying();
+
+                yield return wait;
+            }
+
         }
+        init = false;
+        yield return null;
     }
 
     private bool rotating = false;

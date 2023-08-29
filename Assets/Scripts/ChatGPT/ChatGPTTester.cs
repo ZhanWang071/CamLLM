@@ -26,7 +26,7 @@ public class ChatGPTTester : MonoBehaviour
     [SerializeField] private RectTransform Info;
 
 
-  private float height;
+    private float height;
 
     private List<ChatMessage> messages = new List<ChatMessage>();
 
@@ -214,49 +214,22 @@ public class ChatGPTTester : MonoBehaviour
         item.anchoredPosition = new Vector2(0f, -topY);
     }
 
-    [SerializeField] private RectTransform HighlightDisplay;
-    [SerializeField] private RectTransform HighlightRect;
+    [SerializeField] private GameObject highlightPaintings;
+    //[SerializeField] private RectTransform HighlightDisplay;
+    //[SerializeField] private RectTransform HighlightRect;
     private void HightlightDetails(string landmark)
     {
-        // Get highlighted areas from landmark "painting 001"
-        var coordinates = new List<List<float>>
-            {
-                new List<float> { -68f, 10f, -87f, -74.19f, 5.8f, -87f},
-                // Add more rectangles if needed
-            };
+        string highlightNameToActivate = landmark.Replace("painting", "Highlight");
+        Transform highlightTransform = highlightPaintings.transform.Find(highlightNameToActivate);
 
-        // for each area, instantiate the prefab "Highlight Rect" in the gameobject "hightlight display"
-        foreach (var area in coordinates)
+        if (highlightTransform != null)
         {
-            // Calculate the size of the rectangle
-            float width = area[3] - area[0];
-            float height = area[4] - area[1];
-            Vector3 leftTopPos = Camera.main.WorldToScreenPoint(new Vector3(area[0], area[1], area[2]));
-            Vector3 rightBottomPos = Camera.main.WorldToScreenPoint(new Vector3(area[3], area[4], area[5]));
-
-            // Calculate the center of the rectangle
-            Vector3 center = new Vector3((area[0]+area[3])*0.5f, (area[1] + area[4]) * 0.5f, (area[2] + area[5]) * 0.5f);
-            Debug.Log(center);
-            // Convert world position to screen position
-            // center = Vector3.Lerp(leftTopPos, rightBottomPos, 0.5f);
-            // Vector3 screenPosition = center;
-            Vector3 screenPosition = Camera.main.WorldToScreenPoint(center);
-
-            // Instantiate the prefab "Highlight Rect" in the gameobject "highlight display"
-            var highlightRect = Instantiate(HighlightRect, HighlightDisplay);
-
-            // Set the position and size of the highlight rect
-            highlightRect.transform.position = screenPosition;
-
-            Debug.Log(screenPosition);
-
-            // Set the size of the highlight rect using width and height
-            RectTransform rectTransform = highlightRect.GetComponent<RectTransform>();
-
-            width = Mathf.Abs(rightBottomPos.x - leftTopPos.x);
-            height = Mathf.Abs(rightBottomPos.y - leftTopPos.y);
-
-            rectTransform.sizeDelta = new Vector2(width, height);
+            GameObject specificHighlight = highlightTransform.gameObject;
+            specificHighlight.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("Highlight not found: " + highlightNameToActivate);
         }
     }
 
