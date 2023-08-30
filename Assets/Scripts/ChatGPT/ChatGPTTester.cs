@@ -8,6 +8,7 @@ using OpenAI;
 
 public class ChatGPTTester : MonoBehaviour
 {
+    public Camera mainCamera;
     [SerializeField] private Button askButton;
     [SerializeField] private InputField inputField;
     //[SerializeField] private TextMeshProUGUI chatGPTAnswer;
@@ -22,6 +23,7 @@ public class ChatGPTTester : MonoBehaviour
     public bool Voice = false;
     [SerializeField] private Text2Speech textToSpeech;
 
+    [SerializeField] private GameObject DynamicCanvas;
     [SerializeField] private RectTransform InfoDisplay;
     [SerializeField] private RectTransform Info;
 
@@ -191,7 +193,6 @@ public class ChatGPTTester : MonoBehaviour
         scroll.verticalNormalizedPosition = 0;
     }
 
-    [SerializeField] private RectTransform uiElement;
     private void DisplayInfo(string prompt)
     {
         string landmark = cameraController.GetCurrentLandmark();
@@ -210,8 +211,21 @@ public class ChatGPTTester : MonoBehaviour
         LayoutRebuilder.ForceRebuildLayoutImmediate(item);
 
         // position the information at the center of the info display canvas
-        float topY = uiElement.rect.height / 2 - item.rect.height / 2;
+        float topY = InfoDisplay.rect.height / 2 - item.rect.height / 2;
         item.anchoredPosition = new Vector2(0f, -topY);
+
+        ResetCanvasPos();
+    }
+
+    public float distanceFromCamera = 30.0f;
+    public float angleFromCamera = 0.0f;
+    private void ResetCanvasPos()
+    {
+        // reset the position of the canvas of info display
+        Vector3 rightOffset = Quaternion.Euler(0, angleFromCamera, 0) * mainCamera.transform.forward;
+        Vector3 newPosition = mainCamera.transform.position + (rightOffset.normalized * distanceFromCamera);
+        DynamicCanvas.transform.position = newPosition;
+        DynamicCanvas.transform.rotation = Quaternion.LookRotation(DynamicCanvas.transform.position - mainCamera.transform.position);
     }
 
     [SerializeField] private GameObject highlightPaintings;

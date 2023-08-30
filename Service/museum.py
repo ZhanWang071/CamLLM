@@ -310,15 +310,15 @@ INPUT: I am a single man aged 34. I work as a Chinese art teacher at a universit
 RESPONSE:
 {{
     "Introduction": "Sure! I can help you plan a tour of the museum focusing on Chinese art. Since you have a special background in Chinese art, I will show you some famous Chinese paintings including Section of Goddess of Luo River, Travelers among Mountains and Streams, A Man and His Horse in the Wind, Forest Grotto at Juqu, Shen Zhou self portrait at age 80, and Detail of Figure in a Splashed-Ink Landscape.",
-    "Tour": ["Section of Goddess of Luo River", "Travelers among Mountains and Streams", "A Man and His Horse in the Wind", "Forest Grotto at Juqu", "Shen Zhou self portrait at age 80", "Detail of Figure in a Splashed-Ink Landscape"]
+    "Tour": ["Section of Goddess of Luo River", "Travelers among Mountains and Streams", "A Man and His Horse in the Wind", "Forest Grotto at Juqu", "Shen Zhou self portrait at age 80", "Detail of Figure in a Splashed-Ink Landscape"],
     "TourID": ["painting 008", "painting 009", "painting 010", "painting 011", "painting 012", "painting 015"]
 }}
 
-INPUT: Take me to the most popular painting.
+INPUT: Take me to visit the most popular painting.
 RESPONSE:
 {{
     "Introduction": "The most popular painting in this museum is Mona Lisa. Please follow me and I will take you there",
-    "Tour": ["Mona Lisa"]
+    "Tour": ["Mona Lisa"],
     "TourID": ["painting 000"]
 }}
 

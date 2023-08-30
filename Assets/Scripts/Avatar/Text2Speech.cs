@@ -45,6 +45,15 @@ public class Text2Speech : MonoBehaviour {
         }
     }
 
+    public void PauseTalking()
+    {
+        if (audioSource.isPlaying)
+        {
+            audioSource.Pause();
+            animator.SetBool("Talk", false);
+        }
+    }
+
     public async void MakeAudioRequest(string message) {
         var credentials = new BasicAWSCredentials("AKIAWV2UJSGVFD5HMY5V", "kbu4E4vrHcJ8zdPHOGv7Zw2uBimEqDO5uW9lPMKK");
         var client = new AmazonPollyClient(credentials, RegionEndpoint.APNortheast1);

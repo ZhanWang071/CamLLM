@@ -110,12 +110,12 @@ public class CameraController : MonoBehaviour
             RotateTowardsDestination();
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha0))
-        {
-            init = true;
-        }
+        //if (Input.GetKeyDown(KeyCode.Alpha0))
+        //{
+        //    init = true;
+        //}
 
-        if (init) Init();
+        //if (init) Init();
     }
 
     public bool playing = false;
@@ -163,7 +163,7 @@ public class CameraController : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha5))
         {
-            string chatGPTContent = "{\n    \"Reasoning\": \"The visitor has a special interest in Chinese art, show him more related paintings.\",\n    \"Tour\": [\n        \"Guernica\",\n        \"The Birth of Venus\",\n        \"The Scream\",\n        \"The Great Wave off Kanagawa\",\n        \"The Persistence of Memory\",\n        \"The Last Judgment\",\n        \"The Creation of Adam\",\n        \"The Starry Night\"\n    ],\n    \"TourID\": [\n        \"painting 009\"\n ]\n}";
+            string chatGPTContent = "{\n    \"Reasoning\": \"The visitor has a special interest in Chinese art, show him more related paintings.\",\n    \"Tour\": [\n        \"Guernica\",\n        \"The Birth of Venus\",\n        \"The Scream\",\n        \"The Great Wave off Kanagawa\",\n        \"The Persistence of Memory\",\n        \"The Last Judgment\",\n        \"The Creation of Adam\",\n        \"The Starry Night\"\n    ],\n    \"TourID\": [\n        \"painting 000\"\n ]\n}";
             ProcessChatGPTResponse(chatGPTContent);
         }
     }
@@ -220,6 +220,7 @@ public class CameraController : MonoBehaviour
 
             if (Voice) textToSpeech.MakeAudioRequest(tourResponse.Introduction);
 
+            OnTourIDsReceived?.Invoke(tourIDs);
             Debug.Log("Start navigation");
             StartCoroutine(NavigationTour(tourIDs));
         }
@@ -332,55 +333,51 @@ public class CameraController : MonoBehaviour
 
     private IEnumerator NavigationTour(string[] tourIDs)
     {
-        while (!init)
+        navigating = true;
+
+        playing = true;
+        isOrNotPlaying();
+
+        NavMeshPath path = new NavMeshPath();
+
+        for (int i = 0; i < tourIDs.Length; i++)
         {
-            navigating = true;
 
-            playing = true;
-            isOrNotPlaying();
-
-            NavMeshPath path = new NavMeshPath();
-
-            for (int i = 0; i < tourIDs.Length; i++)
+            while (!playing)
             {
-
-                while (!playing)
-                {
-                    yield return null;
-                }
-
-                Landmark = tourIDs[i];
-                Debug.Log(tourIDs[i]);
-
-                // update camera target positions and orientations
-                UpdateTargetCamera(tourIDs[i]);
-                navMeshAgent.SetDestination(targetPosition);
-
-                NavMesh.CalculatePath(cameraTransform.position, targetPosition, NavMesh.AllAreas, path);
-                DrawArrow(path);
-
-                animator.SetBool("Walk", true);
-
-                // Wait until the camera reaches the painting
-                while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
-                {
-                    yield return null;
-                }
-
-                animator.SetBool("Walk", false);
-
-                yield return new WaitUntil(() => canContinue);
-                canContinue = false;
-                OnCameraReached?.Invoke();
-
-                playing = false;
-                isOrNotPlaying();
-
-                yield return wait;
+                yield return null;
             }
 
+            Landmark = tourIDs[i];
+            Debug.Log(tourIDs[i]);
+
+            // update camera target positions and orientations
+            UpdateTargetCamera(tourIDs[i]);
+            navMeshAgent.SetDestination(targetPosition);
+
+            NavMesh.CalculatePath(cameraTransform.position, targetPosition, NavMesh.AllAreas, path);
+            DrawArrow(path);
+
+            animator.SetBool("Walk", true);
+
+            // Wait until the camera reaches the painting
+            while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+            {
+                yield return null;
+            }
+
+            animator.SetBool("Walk", false);
+
+            yield return new WaitUntil(() => canContinue);
+            canContinue = false;
+            OnCameraReached?.Invoke();
+
+            playing = false;
+            isOrNotPlaying();
+
+            yield return wait;
         }
-        init = false;
+
         yield return null;
     }
 
@@ -417,14 +414,14 @@ public class CameraController : MonoBehaviour
     //TODO: arrow list, add more arrows for longer path
     private void DrawArrow(NavMeshPath path)
     {
-        if (path.status == NavMeshPathStatus.PathComplete)
+        if (path.status == NavMeshPathStatus.PathComplete & path.corners.Length > 1)
         {
             //for (int i = 0; i < path.corners.Length; i++)
             //{
             //    Debug.Log(path.corners[i]);
             //}
             // Instantiate the arrow prefab at the calculated position
-            arrow = Instantiate(arrowPrefab, Vector3.Lerp(path.corners[0], path.corners[1], 0.8f), Quaternion.identity);
+            arrow = Instantiate(arrowPrefab, Vector3.Lerp(path.corners[0], path.corners[1], 0.75f), Quaternion.identity);
             Vector3 arrowPosition = arrow.transform.position;
             arrowPosition.y = 6.0f;
             arrow.transform.position = arrowPosition;
