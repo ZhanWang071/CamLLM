@@ -36,6 +36,7 @@ public class CameraController : MonoBehaviour
     }
 
     public string[] tourIDs;
+    public string[] tours;
 
     public NavMeshAgent navMeshAgent;
     private bool navigating;
@@ -198,7 +199,7 @@ public class CameraController : MonoBehaviour
             TourResponse tourResponse = JsonUtility.FromJson<TourResponse>(chatGPTContent);
             tourIDs = tourResponse.TourID;
             //string reasoning = tourResponse.Reasoning;
-            string[] tours = tourResponse.Tour;
+            tours = tourResponse.Tour;
 
             OnTourIDsReceived?.Invoke(tourIDs);
             Debug.Log("Start navigation");
@@ -216,7 +217,7 @@ public class CameraController : MonoBehaviour
             TourResponse tourResponse = JsonUtility.FromJson<TourResponse>(chatGPTContent);
             tourIDs = tourResponse.TourID;
             //string reasoning = tourResponse.Reasoning;
-            string[] tours = tourResponse.Tour;
+            tours = tourResponse.Tour;
 
             if (Voice) textToSpeech.MakeAudioRequest(tourResponse.Introduction);
 
@@ -355,6 +356,8 @@ public class CameraController : MonoBehaviour
             UpdateTargetCamera(tourIDs[i]);
             navMeshAgent.SetDestination(targetPosition);
 
+            visitedTour.Add(tourIDs[i]);
+
             NavMesh.CalculatePath(cameraTransform.position, targetPosition, NavMesh.AllAreas, path);
             DrawArrow(path);
 
@@ -455,5 +458,11 @@ public class CameraController : MonoBehaviour
                 arrow.transform.rotation = rotation * Quaternion.Euler(0f, 90f, 0f);
             }
         }
+    }
+
+    private static List<string> visitedTour = new List<string>();
+    public List<string> GetTourHistory()
+    {
+        return visitedTour;
     }
 }

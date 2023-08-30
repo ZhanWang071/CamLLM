@@ -19,6 +19,9 @@ def gpt_guidance(request):
         landmark = data_spatial["paintings"][request["landmark"]]["name"]
     else:
         landmark = request["landmark"]
+        
+    history = request["history"]
+    print(history)
 
     messages.append({"role": "user", "content": question})
 

@@ -95,7 +95,8 @@ public class ChatGPTTester : MonoBehaviour
         // Transform the main camera position into the local transform of the scene gameobject
         string currentPosition = Model.transform.InverseTransformPoint(Camera.main.transform.position).ToString();
         string landmark = cameraController.GetCurrentLandmark();
-        StartCoroutine(ChatGPTClient.Instance.Ask(prompt, currentPosition, landmark, (r) => ProcessResponse(r)));
+        List<string> tourHistory = cameraController.GetTourHistory();
+        StartCoroutine(ChatGPTClient.Instance.Ask(prompt, currentPosition, landmark,tourHistory, (r) => ProcessResponse(r)));
     }
 
     [SerializeField] private GameObject Chatbox;

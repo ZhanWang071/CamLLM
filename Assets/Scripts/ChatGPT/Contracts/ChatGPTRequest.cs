@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using System.Collections;
+using System.Collections.Generic;
 
 public class ChatGPTRequest
 {
@@ -16,4 +18,7 @@ public class ChatGPTRequest
 
     [JsonProperty(PropertyName = "landmark")]
     public string Landmark { get; set; }
+
+    [JsonProperty(PropertyName = "history")]
+    public List<string> History { get; set; }
 }
