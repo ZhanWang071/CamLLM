@@ -16,12 +16,38 @@ If the input cannot match "information enhancement", "navigation", or "preferenc
 
 You should only respond the label(s) split by the comma without any other explanation or words. 
 
-Here's an example: 
+Here are examples: 
 INPUT: 
 Please give me a tour to visit this virtual museum.
 RESPONSE: 
 navigation
 
+INPUT: 
+Take me to visit the three most popular items.
+RESPONSE: 
+navigation, information enhancement
+
+INPUT: 
+Take me to visit the three most popular items.
+RESPONSE: 
+navigation, information enhancement
+
+INPUT:
+I am a chinese art teacher.
+RESPONSE:
+preference specification
+
+INPUT:
+Next
+RESPONSE:
+navigation
+
+INPUT:
+What is the result for one plus one.
+RESPONSE:
+error
+
+INPUT:
 """
 
 preference_prompt = """

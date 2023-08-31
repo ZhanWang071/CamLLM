@@ -19,7 +19,7 @@ def gpt_guidance(request):
         landmark = data_spatial["paintings"][request["landmark"]]["name"]
     else:
         landmark = request["landmark"]
-        
+
     history = request["history"]
     print(history)
 
@@ -35,7 +35,9 @@ def gpt_guidance(request):
     if "preference specification" in tasks:
         response = gpt_preference(question)
     if "navigation" in tasks:
-        response = gpt_navigation(question, position, landmark)
+        response = gpt_navigation(question, position, landmark, history)
+        if (response is None):
+            tasks.append("error")
     if "error" in tasks:
         response = gpt_error(question)
     
@@ -46,10 +48,16 @@ def gpt_guidance(request):
 
 """Step 1: classify the user question into which kinds of interaction tasks
 """
-def task_classify(request, model="gpt-3.5-turbo"):
+def task_classify(question, model="gpt-3.5-turbo"):
     # request = prompts.task_classify_prompt+ "INPUT:\n" + request +"\nRESPONSE:\n"
-    task_classify_messages = [{"role": "system", "content": prompts.task_classify_prompt}]
-    task_classify_messages.append({"role": "user", "content": request})
+    task_classify_messages = copy.deepcopy(messages)
+    # task_classify_messages[0]["content"] = prompts.task_classify_prompt
+    # task_classify_messages = [{"role": "system", "content": prompts.task_classify_prompt}]
+    messages[-1]["content"] = question
+
+    task_classify_messages[-1]["content"] = prompts.task_classify_prompt + str(question)+"\nRESPONSE:\n"
+
+    print(task_classify_messages)
 
     response = openai.ChatCompletion.create(
         model=model,
@@ -58,6 +66,7 @@ def task_classify(request, model="gpt-3.5-turbo"):
     )
     result = response.choices[0].message["content"]     # Preference Specification, Navigation
 
+    print(result)
     # Remove parentheses if they exist
     if result.startswith("(") and result.endswith(")"):
         result = result[1:-1]
@@ -74,29 +83,43 @@ Step 2: According classification results, assign the task into the corresponsdin
 """
 
 # TODO: We need to differentiate the tour and direct search
-def gpt_navigation(question, position, landmark,model="gpt-3.5-turbo"):
+def gpt_navigation(question, position, landmark, history, model="gpt-3.5-turbo"):
     print("Response for Navigation: ")
 
     # remember the history conversation and give the response
     navigation_messages = copy.deepcopy(messages)
-    navigation_messages[0]["content"] = museum.navigation_prompt
+    # navigation_messages[0]["content"] = museum.navigation_prompt
+    messages[-1]["content"] = question
+    # check if in progress
+    if (len(landmark)):
+        messages[-1]["content"] = "Now I am looking at the painting " + str(landmark) + ". " + messages[-1]["content"]
+    
+    if (len(history) > 2):
+        messages[-1]["content"] = "I have visited these paintings " + str(history) + ". " + messages[-1]["content"]
+    
+    navigation_messages[-1]["content"] = museum.navigation_prompt +"INPUT:\n" + messages[-1]["content"] +"\nRESPONSE:\n"
+    
     print(navigation_messages)
+
     response = openai.ChatCompletion.create(
         model=model,
         messages=navigation_messages,
         temperature=0,
     )
     result = response.choices[0].message["content"]
-    result = extract_json_part(result)
     print(result)
-    result_ordered = reorder_landmarks(result, position)
+    result = extract_json_part(result)
+    print("JSON-LIKE: "+ str(result))
+    
+    if (result is not None): result = reorder_landmarks(result, position)
 
-    return result_ordered
+    return result
 
 def extract_json_part(input_string):
     pattern = r'{[^{}]*}'
 
     match = re.search(pattern, input_string)
+    print(match)
 
     if match:
         json_like_part = match.group()
