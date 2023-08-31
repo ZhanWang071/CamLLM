@@ -14,7 +14,7 @@ namespace OpenAI
 
         private readonly string fileName = "output.wav";
         private readonly int duration = 5;
-        private readonly int micro_ind = 1;
+        private readonly int micro_ind = 0;
 
         private AudioClip clip;
         private OpenAIApi openai = new OpenAIApi("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", "org-DHVLkr1qbe0yGswiNoV5zi4G");
@@ -36,17 +36,22 @@ namespace OpenAI
             chatTest.Execute(res.Text);
         }
 
+        [SerializeField] private Text2Speech textToSpeech;
         // Update is called once per frame
         private void Update()
         {
             var isPressed = bButton.action.ReadValue<float>() > 0.1f;
             if (isPressed && !wasPressed)
             {
+                // stop if the avatar is still talking
+                textToSpeech.PauseTalking();
+
                 Debug.Log("Start recording...");
                 chatTest.ShowChatbox();
-                // foreach (var d in Microphone.devices) {
-                //     Debug.Log(d.ToString());
-                // }
+                //foreach (var d in Microphone.devices)
+                //{
+                //    Debug.Log(d.ToString());
+                //}
 
                 Debug.Log("Choose microphone: " + Microphone.devices[micro_ind]);
                 clip = Microphone.Start(Microphone.devices[micro_ind], false, duration, 44100);

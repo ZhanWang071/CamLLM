@@ -36,6 +36,7 @@ public class CameraController : MonoBehaviour
     }
 
     public string[] tourIDs;
+    public string[] tours;
 
     public NavMeshAgent navMeshAgent;
     private bool navigating;
@@ -96,7 +97,7 @@ public class CameraController : MonoBehaviour
     }
 
     // public float transitionSpeed = 1f;
-
+    [SerializeField] private bool init = false;
     private void Update()
     {
         // Test camera movement
@@ -110,12 +111,27 @@ public class CameraController : MonoBehaviour
             RotateTowardsDestination();
         }
 
+        //if (Input.GetKeyDown(KeyCode.Alpha0))
+        //{
+        //    init = true;
+        //}
+
+        //if (init) Init();
     }
 
     public bool playing = false;
     [SerializeField] GameObject PlayButton;
     [SerializeField] GameObject PauseButton;
     [SerializeField] Text TourButtonText;
+
+    private void Init()
+    {
+        cameraTransform.position = initalPosition;
+        cameraTransform.localRotation = initalRotation;
+        navigating = false;
+        navMeshAgent.SetDestination(initalPosition);
+    }
+
 
     public void PlayButtonClicked()
     {
@@ -146,17 +162,25 @@ public class CameraController : MonoBehaviour
             string chatGPTContent = "{\n    \"Reasoning\": \"The visitor has a special interest in Chinese art, show him more related paintings.\",\n    \"Tour\": [\n        \"Guernica\",\n        \"The Birth of Venus\",\n        \"The Scream\",\n        \"The Great Wave off Kanagawa\",\n        \"The Persistence of Memory\",\n        \"The Last Judgment\",\n        \"The Creation of Adam\",\n        \"The Starry Night\"\n    ],\n    \"TourID\": [\n        \"painting 015\",\n        \"painting 013\",\n        \"painting 014\",\n        \"painting 008\",\n        \"painting 010\",\n        \"painting 012\",\n        \"painting 011\",\n        \"painting 009\"\n    ]\n}";
             ProcessChatGPTResponse(chatGPTContent);
         }
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            string chatGPTContent = "{\n    \"Reasoning\": \"The visitor has a special interest in Chinese art, show him more related paintings.\",\n    \"Tour\": [\n        \"Guernica\",\n        \"The Birth of Venus\",\n        \"The Scream\",\n        \"The Great Wave off Kanagawa\",\n        \"The Persistence of Memory\",\n        \"The Last Judgment\",\n        \"The Creation of Adam\",\n        \"The Starry Night\"\n    ],\n    \"TourID\": [\n        \"painting 000\"\n ]\n}";
+            ProcessChatGPTResponse(chatGPTContent);
+        }
     }
 
-    private void OnEnable() {
+    private void OnEnable()
+    {
         AvatarController.OnAvatarReached += HandleAvatarReached;
     }
 
-    private void OnDisable() {
+    private void OnDisable()
+    {
         AvatarController.OnAvatarReached -= HandleAvatarReached;
     }
 
-    private void HandleAvatarReached() {
+    private void HandleAvatarReached()
+    {
         canContinue = true;
     }
 
@@ -175,7 +199,7 @@ public class CameraController : MonoBehaviour
             TourResponse tourResponse = JsonUtility.FromJson<TourResponse>(chatGPTContent);
             tourIDs = tourResponse.TourID;
             //string reasoning = tourResponse.Reasoning;
-            string[] tours = tourResponse.Tour;
+            tours = tourResponse.Tour;
 
             OnTourIDsReceived?.Invoke(tourIDs);
             Debug.Log("Start navigation");
@@ -193,10 +217,11 @@ public class CameraController : MonoBehaviour
             TourResponse tourResponse = JsonUtility.FromJson<TourResponse>(chatGPTContent);
             tourIDs = tourResponse.TourID;
             //string reasoning = tourResponse.Reasoning;
-            string[] tours = tourResponse.Tour;
+            tours = tourResponse.Tour;
 
             if (Voice) textToSpeech.MakeAudioRequest(tourResponse.Introduction);
 
+            OnTourIDsReceived?.Invoke(tourIDs);
             Debug.Log("Start navigation");
             StartCoroutine(NavigationTour(tourIDs));
         }
@@ -318,6 +343,7 @@ public class CameraController : MonoBehaviour
 
         for (int i = 0; i < tourIDs.Length; i++)
         {
+
             while (!playing)
             {
                 yield return null;
@@ -329,6 +355,8 @@ public class CameraController : MonoBehaviour
             // update camera target positions and orientations
             UpdateTargetCamera(tourIDs[i]);
             navMeshAgent.SetDestination(targetPosition);
+
+            visitedTour.Add(tourIDs[i]);
 
             NavMesh.CalculatePath(cameraTransform.position, targetPosition, NavMesh.AllAreas, path);
             DrawArrow(path);
@@ -352,6 +380,8 @@ public class CameraController : MonoBehaviour
 
             yield return wait;
         }
+
+        yield return null;
     }
 
     private bool rotating = false;
@@ -387,14 +417,14 @@ public class CameraController : MonoBehaviour
     //TODO: arrow list, add more arrows for longer path
     private void DrawArrow(NavMeshPath path)
     {
-        if (path.status == NavMeshPathStatus.PathComplete)
+        if (path.status == NavMeshPathStatus.PathComplete & path.corners.Length > 1)
         {
             //for (int i = 0; i < path.corners.Length; i++)
             //{
             //    Debug.Log(path.corners[i]);
             //}
             // Instantiate the arrow prefab at the calculated position
-            arrow = Instantiate(arrowPrefab, Vector3.Lerp(path.corners[0], path.corners[1], 0.8f), Quaternion.identity);
+            arrow = Instantiate(arrowPrefab, Vector3.Lerp(path.corners[0], path.corners[1], 0.75f), Quaternion.identity);
             Vector3 arrowPosition = arrow.transform.position;
             arrowPosition.y = 6.0f;
             arrow.transform.position = arrowPosition;
@@ -428,5 +458,11 @@ public class CameraController : MonoBehaviour
                 arrow.transform.rotation = rotation * Quaternion.Euler(0f, 90f, 0f);
             }
         }
+    }
+
+    private static List<string> visitedTour = new List<string>();
+    public List<string> GetTourHistory()
+    {
+        return visitedTour;
     }
 }

@@ -4,13 +4,14 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
 using System.Globalization;
+using System.Collections.Generic;
 
 public class ChatGPTClient : Singleton<ChatGPTClient>
 {
 	[SerializeField]
 	private ChatGPTSettings chatGPTSettings;
 
-	public IEnumerator Ask(string prompt, string position, string landmark, System.Action<ChatGPTResponse> callBack)
+	public IEnumerator Ask(string prompt, string position, string landmark,List<string> history, System.Action<ChatGPTResponse> callBack)
     {
 		var url = chatGPTSettings.debug ? $"{chatGPTSettings.apiURL}?debug=true" : chatGPTSettings.apiURL;
 
@@ -21,7 +22,8 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
 				{
 					Question = prompt,
 					Position = position,
-					Landmark = landmark
+					Landmark = landmark,
+					History = history
                     //Model = chatGPTSettings.apiModel,
                     //Messages = new ChatGPTMessage[]
                     //               {

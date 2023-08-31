@@ -78,7 +78,7 @@ data_spatial = {
             "orientation": (270.0, 0.0, 210.0)
         },
         "painting 015": {
-            "name": "Detail of Figure in a Splashed-Ink Landscape",
+            "name": "Li River in a Splashed-Ink Landscape",
             "position": (15.16, 2.0, -17.32),
             "orientation": (270.0, 0.0, 270.0)
         },
@@ -223,7 +223,7 @@ data = {
             "name": "A woodcut",
         },
         "painting 015": {
-            "name": "Detail of Figure in a Splashed-Ink Landscape",
+            "name": "Li River in a Splashed-Ink Landscape",
         },
         "painting 016": {
             "name": "DasUndbild",
@@ -253,31 +253,31 @@ data = {
             "name": "Krishna_and_Radha",
         },
         "painting 025": {
-            "name": "Khan_Bahadur_Khan_with_men_of_his_clan",
+            "name": "Khan Bahadur Khan with men of his clan",
         },
         "painting 026": {
-            "name": "Emperor_Jahangir_At_The_Jharoka_Window_Of_The_Agra_Fort",
+            "name": "Emperor Jahangir At The Jharoka Window Of The Agra Fort",
         },
         "painting 027": {
-            "name": "Nauroz_durbar_of_Jahangir_(left_half)",
+            "name": "Nauroz durbar of Jahangir (left half)",
         },
         "painting 028": {
-            "name": "MET_DP156677",
+            "name": "Pichhwai for the Festival of Cows",
         },
         "painting 029": {
-            "name": "Flowers_in_a_Green_Vase_by_Leon_Dabo",
+            "name": "Flowers in a Green Vase by Leon Dabo",
         },
         "painting 030": {
-            "name": "Study_of_Flesh_Color_and_Gold",
+            "name": "Study of Flesh Color and Gold",
         },
         "painting 031": {
-            "name": "Whistler_James_Venetian_Scene_1879",
+            "name": "Whistler James Venetian Scene 1879",
         },
         "painting 032": {
             "name": "Louis15",
         },
         "painting 033": {
-            "name": "Chardin_pastel_selfportrait",
+            "name": "Chardin pastel selfportrait",
         },
     }
 }
@@ -310,15 +310,15 @@ INPUT: I am a single man aged 34. I work as a Chinese art teacher at a universit
 RESPONSE:
 {{
     "Introduction": "Sure! I can help you plan a tour of the museum focusing on Chinese art. Since you have a special background in Chinese art, I will show you some famous Chinese paintings including Section of Goddess of Luo River, Travelers among Mountains and Streams, A Man and His Horse in the Wind, Forest Grotto at Juqu, Shen Zhou self portrait at age 80, and Detail of Figure in a Splashed-Ink Landscape.",
-    "Tour": ["Section of Goddess of Luo River", "Travelers among Mountains and Streams", "A Man and His Horse in the Wind", "Forest Grotto at Juqu", "Shen Zhou self portrait at age 80", "Detail of Figure in a Splashed-Ink Landscape"]
+    "Tour": ["Section of Goddess of Luo River", "Travelers among Mountains and Streams", "A Man and His Horse in the Wind", "Forest Grotto at Juqu", "Shen Zhou self portrait at age 80", "Detail of Figure in a Splashed-Ink Landscape"],
     "TourID": ["painting 008", "painting 009", "painting 010", "painting 011", "painting 012", "painting 015"]
 }}
 
-INPUT: Take me to the most popular painting.
+INPUT: Take me to visit the most popular painting.
 RESPONSE:
 {{
     "Introduction": "The most popular painting in this museum is Mona Lisa. Please follow me and I will take you there",
-    "Tour": ["Mona Lisa"]
+    "Tour": ["Mona Lisa"],
     "TourID": ["painting 000"]
 }}
 

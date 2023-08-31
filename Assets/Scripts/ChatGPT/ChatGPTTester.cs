@@ -8,6 +8,7 @@ using OpenAI;
 
 public class ChatGPTTester : MonoBehaviour
 {
+    public Camera mainCamera;
     [SerializeField] private Button askButton;
     [SerializeField] private InputField inputField;
     //[SerializeField] private TextMeshProUGUI chatGPTAnswer;
@@ -22,11 +23,12 @@ public class ChatGPTTester : MonoBehaviour
     public bool Voice = false;
     [SerializeField] private Text2Speech textToSpeech;
 
+    [SerializeField] private GameObject DynamicCanvas;
     [SerializeField] private RectTransform InfoDisplay;
     [SerializeField] private RectTransform Info;
 
 
-  private float height;
+    private float height;
 
     private List<ChatMessage> messages = new List<ChatMessage>();
 
@@ -49,6 +51,25 @@ public class ChatGPTTester : MonoBehaviour
             DisplayInfo("To determine the three most popular paintings in the museum, I would need access to the popularity data of each painting. Unfortunately, the popularity information is not provided in the given data. However, I can provide you with a list of the top three most famous paintings in general:\r\n\r\n1. \"Mona Lisa\" by Leonardo da Vinci\r\n2. \"The Last Supper\" by Leonardo da Vinci\r\n3. \"The Scream\" by Edvard Munch\r\n\r\nThese paintings are widely recognized and highly regarded in the art world.");
             //DisplayInfo("Welcome to the virtual museum! This museum is home to a diverse collection of paintings from various artists and periods. The museum aims to provide visitors with an immersive and educational experience.\r\n\r\nThe museum features a wide range of artworks, including famous masterpieces such as the \"Mona Lisa\" by Leonardo da Vinci");
         }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            HightlightDetails("painting 015");
+        }
+
+        // X button: chat button
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            // Trigger the click event of the tour button
+            ChatboxButton.GetComponent<Button>().onClick.Invoke();
+        }
+
+        // A button: tour button
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            // Trigger the click event of the tour button
+            TourButton.GetComponent<Button>().onClick.Invoke();
+        }
+
     }
 
     public void Execute(string input = "")
@@ -74,11 +95,13 @@ public class ChatGPTTester : MonoBehaviour
         // Transform the main camera position into the local transform of the scene gameobject
         string currentPosition = Model.transform.InverseTransformPoint(Camera.main.transform.position).ToString();
         string landmark = cameraController.GetCurrentLandmark();
-        StartCoroutine(ChatGPTClient.Instance.Ask(prompt, currentPosition, landmark, (r) => ProcessResponse(r)));
+        List<string> tourHistory = cameraController.GetTourHistory();
+        StartCoroutine(ChatGPTClient.Instance.Ask(prompt, currentPosition, landmark,tourHistory, (r) => ProcessResponse(r)));
     }
 
     [SerializeField] private GameObject Chatbox;
     [SerializeField] private GameObject ChatboxButton;
+    [SerializeField] private GameObject TourButton;
     private bool isChatboxShow = false;
     public void HideChatbox()
     {
@@ -88,7 +111,7 @@ public class ChatGPTTester : MonoBehaviour
             ChatboxButton.SetActive(true);
 
             Vector3 currentPosition = ChatboxButton.transform.position;
-            currentPosition.y = 74.0f;
+            currentPosition.y = TourButton.transform.position.y;
             ChatboxButton.transform.position = currentPosition;
 
             isChatboxShow = false;
@@ -103,7 +126,7 @@ public class ChatGPTTester : MonoBehaviour
             //ChatboxButton.SetActive(false);
 
             Vector3 currentPosition = ChatboxButton.transform.position;
-            currentPosition.y = 688.0f;
+            currentPosition.y = Chatbox.transform.position.y + Chatbox.GetComponent<RectTransform>().sizeDelta.y;
             ChatboxButton.transform.position = currentPosition;
 
             isChatboxShow = true;
@@ -171,7 +194,6 @@ public class ChatGPTTester : MonoBehaviour
         scroll.verticalNormalizedPosition = 0;
     }
 
-    [SerializeField] private RectTransform uiElement;
     private void DisplayInfo(string prompt)
     {
         string landmark = cameraController.GetCurrentLandmark();
@@ -180,6 +202,7 @@ public class ChatGPTTester : MonoBehaviour
         if (landmark.Length > 0)
         {
             item.GetChild(0).GetChild(0).GetComponent<Text>().text = landmark;
+            HightlightDetails(landmark);
         }
         else
         {
@@ -189,10 +212,41 @@ public class ChatGPTTester : MonoBehaviour
         LayoutRebuilder.ForceRebuildLayoutImmediate(item);
 
         // position the information at the center of the info display canvas
-        float topY = uiElement.rect.height / 2 - item.rect.height / 2;
+        float topY = InfoDisplay.rect.height / 2 - item.rect.height / 2;
         item.anchoredPosition = new Vector2(0f, -topY);
+
+        ResetCanvasPos();
     }
 
+    public float distanceFromCamera = 30.0f;
+    public float angleFromCamera = 0.0f;
+    private void ResetCanvasPos()
+    {
+        // reset the position of the canvas of info display
+        Vector3 rightOffset = Quaternion.Euler(0, angleFromCamera, 0) * mainCamera.transform.forward;
+        Vector3 newPosition = mainCamera.transform.position + (rightOffset.normalized * distanceFromCamera);
+        DynamicCanvas.transform.position = newPosition;
+        DynamicCanvas.transform.rotation = Quaternion.LookRotation(DynamicCanvas.transform.position - mainCamera.transform.position);
+    }
+
+    [SerializeField] private GameObject highlightPaintings;
+    //[SerializeField] private RectTransform HighlightDisplay;
+    //[SerializeField] private RectTransform HighlightRect;
+    private void HightlightDetails(string landmark)
+    {
+        string highlightNameToActivate = landmark.Replace("painting", "Highlight");
+        Transform highlightTransform = highlightPaintings.transform.Find(highlightNameToActivate);
+
+        if (highlightTransform != null)
+        {
+            GameObject specificHighlight = highlightTransform.gameObject;
+            specificHighlight.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("Highlight not found: " + highlightNameToActivate);
+        }
+    }
 
     private void DeleteChildren(RectTransform parentRectTransform)
     {
