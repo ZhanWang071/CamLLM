@@ -53,9 +53,10 @@ def task_classify(question, model="gpt-3.5-turbo"):
     task_classify_messages = copy.deepcopy(messages)
     # task_classify_messages[0]["content"] = prompts.task_classify_prompt
     # task_classify_messages = [{"role": "system", "content": prompts.task_classify_prompt}]
-    messages[-1]["content"] = question
+    # messages[-1]["content"] = question
 
-    task_classify_messages[-1]["content"] = prompts.task_classify_prompt + str(question)+"\nRESPONSE:\n"
+    # task_classify_messages[-1]["content"] = prompts.task_classify_prompt + str(question)+"\nRESPONSE:\n"
+    task_classify_messages[-1]["content"] = prompts.task_classify_prompt + "INPUT:\n" + str(question)+"\nRESPONSE:\n"
 
     print(task_classify_messages)
 
@@ -89,15 +90,16 @@ def gpt_navigation(question, position, landmark, history, model="gpt-3.5-turbo")
     # remember the history conversation and give the response
     navigation_messages = copy.deepcopy(messages)
     # navigation_messages[0]["content"] = museum.navigation_prompt
-    messages[-1]["content"] = question
+    # messages[-1]["content"] = question
     # check if in progress
     if (len(landmark)):
-        messages[-1]["content"] = "Now I am looking at the painting " + str(landmark) + ". " + messages[-1]["content"]
+        # messages[-1]["content"] = "Now I am looking at the painting " + str(landmark) + ". " + messages[-1]["content"]
+        question = "Now I am looking at the painting " + str(landmark) + ". " + question
     
     if (len(history) > 2):
-        messages[-1]["content"] = "I have visited these paintings " + str(history) + ". " + messages[-1]["content"]
+        question = "I have visited these paintings " + str(history) + ". " + question
     
-    navigation_messages[-1]["content"] = museum.navigation_prompt +"INPUT:\n" + messages[-1]["content"] +"\nRESPONSE:\n"
+    navigation_messages[-1]["content"] = museum.navigation_prompt+"INPUT:\n" + question +"\nRESPONSE:\n"
     
     print(navigation_messages)
 

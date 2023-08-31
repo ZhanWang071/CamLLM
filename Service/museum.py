@@ -178,106 +178,106 @@ data_spatial = {
 data = {
     "paintings": {
         "painting 000": {
-            "name": "Mona Lisa", 
+            "name": "Mona Lisa"
         },
         "painting 001": {
-            "name": "Last Supper",
+            "name": "Last Supper"
         },
         "painting 002": {
-            "name": "Vitruvian Man",
+            "name": "Vitruvian Man"
         },
         "painting 003": {
-            "name": "The Scream",
+            "name": "The Scream"
         },
         "painting 004": {
-            "name": "Wheatfield with Crows",
+            "name": "Wheatfield with Crows"
         },
         "painting 005": {
-            "name": "Impression, Sunrise",
+            "name": "Impression, Sunrise"
         },
         "painting 006": {
-            "name": "Guernica",
+            "name": "Guernica"
         },
         "painting 007": {
-            "name": "The Birth of Venus",
+            "name": "The Birth of Venus"
         },
         "painting 008": {
-            "name": "Section of Goddess of Luo River",
+            "name": "Section of Goddess of Luo River"
         },
         "painting 009": {
-            "name": "Travelers among Mountains and Streams",
+            "name": "Travelers among Mountains and Streams"
         },
         "painting 010": {
-            "name": "A Man and His Horse in the Wind",
+            "name": "A Man and His Horse in the Wind"
         },
         "painting 011": {
-            "name": "Forest Grotto at Juqu",
+            "name": "Forest Grotto at Juqu"
         },
         "painting 012": {
-            "name": "Shen Zhou self portrait at age 80",
+            "name": "Shen Zhou self portrait at age 80"
         },
         "painting 013": {
-            "name": "The Great Wave",
+            "name": "The Great Wave"
         },
         "painting 014": {
-            "name": "A woodcut",
+            "name": "A woodcut"
         },
         "painting 015": {
-            "name": "Li River in a Splashed-Ink Landscape",
+            "name": "Li River in a Splashed-Ink Landscape"
         },
         "painting 016": {
-            "name": "DasUndbild",
+            "name": "Das Undbild"
         },
         "painting 017": {
-            "name": "Caoutchouc",
+            "name": "Caoutchouc"
         },
         "painting 018": {
-            "name": "Composition_10",
+            "name": "Composition no.10"
         },
         "painting 019": {
-            "name": "Head(Tête)",
+            "name": "Head (Tête)"
         },
         "painting 020": {
-            "name": "James_Abbot_McNeill_Whistler_012",
+            "name": "Night in Black and Gold, The falling Rocket"
         },
         "painting 021": {
-            "name": "Premier Disque",
+            "name": "Premier Disque"
         },
         "painting 022": {
-            "name": "Tarentelle",
+            "name": "Tarentelle"
         },
         "painting 023": {
-            "name": "Amorpha",
+            "name": "Amorpha"
         },
         "painting 024": {
-            "name": "Krishna_and_Radha",
+            "name": "Krishna and Radha"
         },
         "painting 025": {
-            "name": "Khan Bahadur Khan with men of his clan",
+            "name": "Khan Bahadur Khan with men of his clan"
         },
         "painting 026": {
-            "name": "Emperor Jahangir At The Jharoka Window Of The Agra Fort",
+            "name": "Emperor Jahangir At The Jharoka Window Of The Agra Fort"
         },
         "painting 027": {
-            "name": "Nauroz durbar of Jahangir (left half)",
+            "name": "Nauroz durbar of Jahangir (left half)"
         },
         "painting 028": {
-            "name": "Pichhwai for the Festival of Cows",
+            "name": "Pichhwai for the Festival of Cows"
         },
         "painting 029": {
-            "name": "Flowers in a Green Vase by Leon Dabo",
+            "name": "Flowers in a Green Vase by Leon Dabo"
         },
         "painting 030": {
-            "name": "Study of Flesh Color and Gold",
+            "name": "Study of Flesh Color and Gold"
         },
         "painting 031": {
-            "name": "Whistler James Venetian Scene 1879",
+            "name": "Whistler James Venetian Scene 1879"
         },
         "painting 032": {
-            "name": "Louis15",
+            "name": "Louis15"
         },
         "painting 033": {
-            "name": "Chardin pastel selfportrait",
+            "name": "Chardin pastel selfportrait"
         },
     }
 }
@@ -331,6 +331,14 @@ RESPONSE:
     "Introduction": "Now, let's move on to the 'Last Supper'. Follow me as we navigate through the museum to find the painting.",
     "Tour": ["Last Supper", "Vitruvian Man"],
     "TourID": ["painting 001","painting 002"]
+}}
+
+INPUT: I want to see some modern style paintings, could you
+RESPONSE:
+{{
+    "Introduction": "Certainly! Here are some modern style painting. Let's begin out tour. We first head towards the painting "DasUndbild"",
+    "Tour": ["DasUndbild", "Caoutchouc","Composition","Head(Tête)"],
+    "TourID": ["painting 016","painting 017","painting 018","painting 019"]
 }}
 
 This museum has stored some paintings and  their names, spatial positions and orientations (both stored in Unity 3D coordinate format) are shown below:

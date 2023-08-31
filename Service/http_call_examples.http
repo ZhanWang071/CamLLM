@@ -2,7 +2,10 @@ POST http://127.0.0.1:5000/chatgpt/question?debug=true HTTP/1.1
 content-type: application/json
 
 {
-    "question" : "Hello, who are you?"
+    "question" : "Hello, who are you?",
+    "position" : "(0.0,0.0,0.0)",
+    "landmark" : "",
+    "history": "[]"
 }
 
 POST http://127.0.0.1:5000/chatgpt/question?debug=true HTTP/1.1

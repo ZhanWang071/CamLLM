@@ -12,7 +12,7 @@ I have a classification task about interactive types in virtual reality with fou
 "information enhancement" refers to questions that require information users are not familiar with to enhance their understanding of the virtual environment. Or the input is similar to "please explain more". 
 "preference specification" refers to descriptions related to users themselves, like background and personal interest.
 "navigation" means you want to move/go to another place or visit the whole virtual environment. You might say: "take me somewhere" or "give me a tour". 
-If the input cannot match "information enhancement", "navigation", or "preference specification", it will be defined as the "error" label. 
+If the input is not related to the current items of this environment, it will be defined as the "error" label. 
 
 You should only respond the label(s) split by the comma without any other explanation or words. 
 
@@ -23,7 +23,7 @@ RESPONSE:
 navigation
 
 INPUT: 
-Take me to visit the three most popular items.
+Please guide me to the three most popular items.
 RESPONSE: 
 navigation, information enhancement
 
@@ -41,6 +41,11 @@ INPUT:
 Next
 RESPONSE:
 navigation
+
+INPUT:
+I want to see some modern style paintings, could you?
+RESPONSE:
+navigation, information enhancement, preference specification
 
 INPUT:
 What is the result for one plus one.
