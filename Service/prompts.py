@@ -61,6 +61,44 @@ preference_prompt = """
 
 # extract contextual info for display
 extract_prompt = """
-Extract the context in 3-5 sentences and sometime you can use a clear way to display the information below directly such as bullet points if neccessary:
-[Information]: 
+1. detect if the user start visiting, during the tour, or finishing the tour.
+2. If the user is at the beginning or ending of the tour, extract the context in 2-3 sentences and sometime you can use a clear way to display the information below directly such as bullet points if neccessary.
+3. Otherwise, extract the important points with words or one-sentence description.
+
+Here are several examples:
+INPUT:
+The Great Wave off Kanagawa is a woodblock print by Japanese ukiyo-e artist Hokusai, created in late 1831 during the Edo period of Japanese history. The print depicts three boats moving through a storm-tossed sea, with a large wave forming a spiral in the centre and Mount Fuji visible in the background.
+Reason: The user is during the tour, and you need to extract the important points like author, year, and style.
+RESPONSE:
+Name: The Great Wave off Kanagawa
+Author: Hokusai
+Year: 1831
+Country: Japan
+Introduction: The print depicts three boats moving through a storm-tossed sea, with a large wave forming a spiral in the centre and Mount Fuji visible in the background.
+
+INPUT: 
+"""
+
+info_prompt = """
+You need to give the answers following the steps:
+1. detect if the user start visiting, during the tour, or finishing the tour.
+2. If the user is at the beginning or ending of the tour, give the general description and suggestions for overview or summarization respectively. Response in less than 5 sentences. 
+3. During the progress, if the user is only interested in the current painting,  only give the most imporatant details about this painting like author, year, and style. Response in less than 3 sentences. 
+4. During the progress, if the user relate to or compare different paintings. List all the related paintings name and one-sentence bio in a direct and clear way.
+4. Do not mention anything in a mathmatical way.
+
+Here are some examples:
+INPUT:
+Now I am looking at the painting "The Great Wave". Please introduce me this painting.
+Reason: The user is during the tour, and want to get an introcution about the painting "The Great Wave".
+RESPONSE:
+The Great Wave off Kanagawa is a woodblock print by Japanese ukiyo-e artist Hokusai, created in late 1831 during the Edo period of Japanese history. The print depicts three boats moving through a storm-tossed sea, with a large wave forming a spiral in the centre and Mount Fuji visible in the background.
+
+INPUT:
+Now I am looking at the painting "The Greate Wave". Is there any other painting of the same style in this museum.
+Reason: The user is during the tour, and want to get related paintings about the painting "The Great Wave" belonging to the same painting style.
+RESPONSE:
+Yes, the painting style of "The Great Wave" is [style name]. Annd there are some other paintings of the same style as "The Great Wave":
+- "Li River in a Splashed-Ink Landscape": a Chinese painting that captures the serene beauty of the Li River through the unique technique of splashed-ink, depicting the ethereal landscapes in an evocative and abstract manner.
+
 """

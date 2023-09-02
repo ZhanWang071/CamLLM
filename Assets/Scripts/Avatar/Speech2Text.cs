@@ -13,18 +13,19 @@ namespace OpenAI
         [SerializeField] private InputActionReference bButton;
 
         private readonly string fileName = "output.wav";
-        private readonly int duration = 5;
+        private readonly int duration = 50;
         private readonly int micro_ind = 0;
 
         private AudioClip clip;
-        private OpenAIApi openai = new OpenAIApi("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", "org-DHVLkr1qbe0yGswiNoV5zi4G");
+        private OpenAIApi openai = new OpenAIApi("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");
 
         private bool wasPressed = false;
 
         private async void SendMessage()
         {
             byte[] data = SaveWav.Save(fileName, clip);
-            var req = new CreateAudioTranscriptionsRequest {
+            var req = new CreateAudioTranscriptionsRequest
+            {
                 FileData = new FileData() { Data = data, Name = "audio.wav" },
                 // File = Application.persistentDataPath + "/" + fileName,
                 Model = "whisper-1",

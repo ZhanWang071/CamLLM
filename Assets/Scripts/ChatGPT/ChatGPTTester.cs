@@ -23,6 +23,7 @@ public class ChatGPTTester : MonoBehaviour
     public bool Voice = false;
     [SerializeField] private Text2Speech textToSpeech;
 
+    [SerializeField] private GameObject Canvas;
     [SerializeField] private GameObject DynamicCanvas;
     [SerializeField] private RectTransform InfoDisplay;
     [SerializeField] private RectTransform Info;
@@ -86,17 +87,24 @@ public class ChatGPTTester : MonoBehaviour
         {
             prompt = input;
         }
-        AppendMessage(prompt, "user");
+        if (prompt == null || prompt.Length <= 0 || prompt == "you")
+        {
+            AppendMessage("Record Nothing! Please input your question again!", "assistant");
+        }
+        else
+        {
+            AppendMessage(prompt, "user");
 
-        askButton.enabled = false;
-        inputField.text = "";
-        inputField.enabled = false;
+            askButton.enabled = false;
+            inputField.text = "";
+            inputField.enabled = false;
 
-        // Transform the main camera position into the local transform of the scene gameobject
-        string currentPosition = Model.transform.InverseTransformPoint(Camera.main.transform.position).ToString();
-        string landmark = cameraController.GetCurrentLandmark();
-        List<string> tourHistory = cameraController.GetTourHistory();
-        StartCoroutine(ChatGPTClient.Instance.Ask(prompt, currentPosition, landmark,tourHistory, (r) => ProcessResponse(r)));
+            // Transform the main camera position into the local transform of the scene gameobject
+            string currentPosition = Model.transform.InverseTransformPoint(Camera.main.transform.position).ToString();
+            string landmark = cameraController.GetCurrentLandmark();
+            List<string> tourHistory = cameraController.GetTourHistory();
+            StartCoroutine(ChatGPTClient.Instance.Ask(prompt, currentPosition, landmark, tourHistory, (r) => ProcessResponse(r)));
+        }
     }
 
     [SerializeField] private GameObject Chatbox;
@@ -108,11 +116,11 @@ public class ChatGPTTester : MonoBehaviour
         if (Chatbox != null)
         {
             Chatbox.SetActive(false);
-            ChatboxButton.SetActive(true);
 
-            Vector3 currentPosition = ChatboxButton.transform.position;
-            currentPosition.y = TourButton.transform.position.y;
-            ChatboxButton.transform.position = currentPosition;
+            //ChatboxButton.SetActive(true);
+            //Vector3 currentPosition = ChatboxButton.transform.position;
+            //currentPosition.y = TourButton.transform.position.y;
+            //ChatboxButton.transform.position = currentPosition;
 
             isChatboxShow = false;
         }
@@ -122,12 +130,13 @@ public class ChatGPTTester : MonoBehaviour
     {
         if (Chatbox != null)
         {
+            ResetCanvasPos();
             Chatbox.SetActive(true);
-            //ChatboxButton.SetActive(false);
 
-            Vector3 currentPosition = ChatboxButton.transform.position;
-            currentPosition.y = Chatbox.transform.position.y + Chatbox.GetComponent<RectTransform>().sizeDelta.y;
-            ChatboxButton.transform.position = currentPosition;
+            //ChatboxButton.SetActive(false);
+            //Vector3 currentPosition = ChatboxButton.transform.position;
+            //currentPosition.y = Chatbox.transform.position.y + Chatbox.GetComponent<RectTransform>().sizeDelta.y;
+            //ChatboxButton.transform.position = currentPosition;
 
             isChatboxShow = true;
         }
@@ -215,18 +224,26 @@ public class ChatGPTTester : MonoBehaviour
         float topY = InfoDisplay.rect.height / 2 - item.rect.height / 2;
         item.anchoredPosition = new Vector2(0f, -topY);
 
-        ResetCanvasPos();
+        ResetHighlightCanvasPos();
     }
 
     public float distanceFromCamera = 30.0f;
     public float angleFromCamera = 0.0f;
-    private void ResetCanvasPos()
+    private void ResetHighlightCanvasPos()
     {
         // reset the position of the canvas of info display
         Vector3 rightOffset = Quaternion.Euler(0, angleFromCamera, 0) * mainCamera.transform.forward;
         Vector3 newPosition = mainCamera.transform.position + (rightOffset.normalized * distanceFromCamera);
         DynamicCanvas.transform.position = newPosition;
         DynamicCanvas.transform.rotation = Quaternion.LookRotation(DynamicCanvas.transform.position - mainCamera.transform.position);
+    }
+
+    private void ResetCanvasPos()
+    {
+        // reset the position of the canvas of chatbox
+        Vector3 newPosition = mainCamera.transform.position + mainCamera.transform.forward * distanceFromCamera;
+        Canvas.transform.position = newPosition;
+        Canvas.transform.rotation = Quaternion.LookRotation(Canvas.transform.position - mainCamera.transform.position);
     }
 
     [SerializeField] private GameObject highlightPaintings;

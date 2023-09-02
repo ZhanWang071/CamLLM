@@ -36,21 +36,9 @@ public class AvatarController : MonoBehaviour
         initalRotation = transform.rotation;
     }
 
-    private bool init = false;
     private void Update()
     {
 
-        if (Input.GetKeyDown(KeyCode.Alpha0))
-        {
-            init = true;
-        }
-
-        if (init)
-        {
-            transform.position = initalPosition;
-            transform.rotation = initalRotation;
-            navMeshAgent.SetDestination(initalPosition);
-        };
     }
 
     private void SetCameraToNearestNavMeshPosition()
@@ -96,46 +84,40 @@ public class AvatarController : MonoBehaviour
 
     private IEnumerator NavigationTour(string[] tourIDs)
     {
-        while (!init)
+        for (int i = 0; i < tourIDs.Length; i++)
         {
-            for (int i = 0; i < tourIDs.Length; i++)
+            while (!cameraController.playing)
             {
-                while (!cameraController.playing)
-                {
-                    yield return null;
-                }
-
-                // update avatar target positions and orientations
-                UpdateTargetAvatar(tourIDs[i]);
-                animator.SetBool("Walk", true);
-                navMeshAgent.SetDestination(targetPosition);
-
-                // Wait until the avatar reaches the painting
-                while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
-                {
-                    yield return null;
-                }
-                animator.SetBool("Walk", false);
-
-                // After the camera reaches the target painting, rotate to the camera smoothly
-                do
-                {
-                    targetRotation = Quaternion.LookRotation(
-                        new Vector3(targetCameraPosition.x - transform.position.x, 0, targetCameraPosition.z - transform.position.z)
-                    );
-                    avatarTransform.rotation = Quaternion.RotateTowards(avatarTransform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-                    yield return null;
-                } while (Quaternion.Angle(avatarTransform.rotation, targetRotation) > 0.1f);
-
-                OnAvatarReached?.Invoke();
-                yield return new WaitUntil(() => canContinue);
-                canContinue = false;
+                yield return null;
             }
 
+            // update avatar target positions and orientations
+            UpdateTargetAvatar(tourIDs[i]);
+            animator.SetBool("Walk", true);
+            navMeshAgent.SetDestination(targetPosition);
+
+            // Wait until the avatar reaches the painting
+            while (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+            {
+                yield return null;
+            }
+            animator.SetBool("Walk", false);
+
+            // After the camera reaches the target painting, rotate to the camera smoothly
+            do
+            {
+                targetRotation = Quaternion.LookRotation(
+                    new Vector3(targetCameraPosition.x - targetPosition.x, 0, targetCameraPosition.z - targetPosition.z)
+                );
+                avatarTransform.rotation = Quaternion.RotateTowards(avatarTransform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                yield return null;
+            } while (Quaternion.Angle(avatarTransform.rotation, targetRotation) > 0.1f);
+
+            OnAvatarReached?.Invoke();
+            yield return new WaitUntil(() => canContinue);
+            canContinue = false;
         }
 
-        init = false;
-        yield return null;
     }
 
     private void UpdateTargetAvatar(string tourID)

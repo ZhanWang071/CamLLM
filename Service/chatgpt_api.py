@@ -6,6 +6,7 @@ import museum
 import prompts
 import copy
 import re
+import ast
 
 openai.api_key = "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"
 
@@ -20,7 +21,10 @@ def gpt_guidance(request):
     else:
         landmark = request["landmark"]
 
-    history = request["history"]
+    if (len(request["history"])):
+        history = [data_spatial["paintings"][item]["name"] for item in ast.literal_eval(request["history"])]
+    else:
+        history = request["history"]
     print(history)
 
     messages.append({"role": "user", "content": question})
@@ -31,13 +35,16 @@ def gpt_guidance(request):
     response = ""
     context = ""
     if "information enhancement" in tasks:
-        response, context = gpt_information(question, position, landmark)
+        response, context = gpt_information(question, position, landmark, history)
     if "preference specification" in tasks:
         response = gpt_preference(question)
+    
     if "navigation" in tasks:
         response = gpt_navigation(question, position, landmark, history)
         if (response is None):
-            tasks.append("error")
+            new_response = ["error" if item == "navigation" else item for item in response]
+            response = new_response
+    
     if "error" in tasks:
         response = gpt_error(question)
     
@@ -48,7 +55,7 @@ def gpt_guidance(request):
 
 """Step 1: classify the user question into which kinds of interaction tasks
 """
-def task_classify(question, model="gpt-3.5-turbo"):
+def task_classify(question, model="gpt-3.5-turbo-16k"):
     # request = prompts.task_classify_prompt+ "INPUT:\n" + request +"\nRESPONSE:\n"
     task_classify_messages = copy.deepcopy(messages)
     # task_classify_messages[0]["content"] = prompts.task_classify_prompt
@@ -84,7 +91,7 @@ Step 2: According classification results, assign the task into the corresponsdin
 """
 
 # TODO: We need to differentiate the tour and direct search
-def gpt_navigation(question, position, landmark, history, model="gpt-3.5-turbo"):
+def gpt_navigation(question, position, landmark, history, model="gpt-3.5-turbo-16k"):
     print("Response for Navigation: ")
 
     # remember the history conversation and give the response
@@ -129,16 +136,28 @@ def extract_json_part(input_string):
     else:
         return None
 
-def gpt_information(question, position, landmark, model="gpt-3.5-turbo"):
-    print("Response for Information Enhancement: ")
+def gpt_information(question, position, landmark, history, model="gpt-3.5-turbo-16k"):
+    
+    # if (len(landmark)):
+    #     messages[-1]["content"] = "Now I am looking at the painting " + str(landmark) + ". " + question + "\n Response in less than 4 sentences."
+    # else:
+    #     messages[-1]["content"] = "Now I am standing at the position in the model: " + str(position) + ". " + question + "\n Response in less than 5 sentences. Do not mention the position in a mathmatical way."
+
+    info_messages = copy.deepcopy(messages)
+
     if (len(landmark)):
-        messages[-1]["content"] = "Now I am looking at the painting " + str(landmark) + ". " + question + "\n Response in less than 10 sentences."
-    else:
-        messages[-1]["content"] = "Now I am standing at the position in the model: " + str(position) + ". " + question + "\n Response in less than 10 sentences. Do not mention the position in a mathmatical way."
+        question = "Now I am visitng the painting '" + str(landmark) + "' and want to know information about it. " + question
+    if (len(history) > 2):
+        question = "I have visited these paintings " + str(history) + ". " + question
+
+    info_messages[-1]["content"] = prompts.info_prompt+"INPUT:\n" + question +"\nRESPONSE:\n"
+
+    print("Question for information enhancement: "+info_messages[-1]["content"])
+    print("Response for Information Enhancement: ")
 
     response = openai.ChatCompletion.create(
         model=model,
-        messages=messages,
+        messages=info_messages,
         temperature=0,
     )
 
@@ -148,7 +167,7 @@ def gpt_information(question, position, landmark, model="gpt-3.5-turbo"):
     result_context = extract_info(result)
     return result, result_context
 
-def extract_info(question, model="gpt-3.5-turbo"):
+def extract_info(question, model="gpt-3.5-turbo-16k"):
     messages = [{"role": "system", "content": "You are a helpful assistant."},{"role": "user", "content": prompts.extract_prompt + question}]
 
     response = openai.ChatCompletion.create(
@@ -160,7 +179,7 @@ def extract_info(question, model="gpt-3.5-turbo"):
     return response.choices[0].message["content"]
 
 # TODO: Analysis user preference and give some natural response
-def gpt_preference(question, model="gpt-3.5-turbo"):
+def gpt_preference(question, model="gpt-3.5-turbo-16k"):
     print("Response for User Preference: ")
 
     response = openai.ChatCompletion.create(
@@ -172,7 +191,7 @@ def gpt_preference(question, model="gpt-3.5-turbo"):
     print(result)
     return result
 
-def gpt_error(question, model="gpt-3.5-turbo"):
+def gpt_error(question, model="gpt-3.5-turbo-16k"):
     print("Response for Error: ")
 
     response = openai.ChatCompletion.create(

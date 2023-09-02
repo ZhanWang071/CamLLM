@@ -97,7 +97,7 @@ public class CameraController : MonoBehaviour
     }
 
     // public float transitionSpeed = 1f;
-    [SerializeField] private bool init = false;
+    //[SerializeField] private bool init = false;
     private void Update()
     {
         // Test camera movement
