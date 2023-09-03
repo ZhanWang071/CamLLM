@@ -185,8 +185,6 @@ public class ChatGPTTester : MonoBehaviour
             Debug.Log("Response in voice...");
             HideChatbox();
 
-            if (Voice) textToSpeech.MakeAudioRequest(chatGPTContent);
-
             if (ResponseTasks.Contains("navigation"))
             {
                 DeleteAllChildren(VirtualMirror);
@@ -194,6 +192,8 @@ public class ChatGPTTester : MonoBehaviour
             }
             else
             {
+                if (Voice) textToSpeech.MakeAudioRequest(chatGPTContent);
+
                 minimap.HideMinimap();
 
                 if (ResponseTasks.Contains("information enhancement"))

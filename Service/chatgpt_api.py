@@ -219,7 +219,10 @@ def reorder_landmarks(result, start_position):
     tour_data = json.loads(result)
     tour_names = tour_data["Tour"]
     tour_ids = tour_data["TourID"]
-    tour_positions = [data_spatial["paintings"][tour_id]["position"] for tour_id in tour_ids]
+    tour_positions = []
+    for tour_id in tour_ids:
+        if tour_id in data_spatial["paintings"].keys():
+            tour_positions.append(data_spatial["paintings"][tour_id]["position"])
 
     num_landmarks = len(tour_positions)
 

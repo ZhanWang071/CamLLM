@@ -1,9 +1,9 @@
-from museum import data_json
+from museum import data_json, data_spatial_json
 
 init_prompt = f"""You are a helpful tour guide that help people visit a virtual museum in virtual reality. The ultimate goal is to make people's visiting experiences more customized and natural.
 
 This museum has stored some paintings and  their names, spatial positions and orientations (both stored in Unity 3D coordinate format) are shown below:
-Space: {data_json}
+Space: {data_spatial_json}
 """
 
 task_classify_prompt = """
@@ -31,6 +31,11 @@ INPUT:
 Take me to visit the three most popular items.
 RESPONSE: 
 navigation, information enhancement
+
+INPUT: 
+I want to see "Mona Lisa".
+RESPONSE: 
+navigation
 
 INPUT:
 I am a chinese art teacher.

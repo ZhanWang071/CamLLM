@@ -226,6 +226,8 @@ public class CameraController : MonoBehaviour
             //string reasoning = tourResponse.Reasoning;
             tours = tourResponse.Tour;
 
+            if (Voice) textToSpeech.MakeAudioRequest(tourResponse.Introduction);
+
             OnTourIDsReceived?.Invoke(tourIDs);
             Debug.Log("Start navigation");
             StartCoroutine(NavigationTour(tourIDs));
