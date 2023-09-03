@@ -27,6 +27,8 @@ public class ChatGPTTester : MonoBehaviour
     [SerializeField] private GameObject DynamicCanvas;
     [SerializeField] private RectTransform InfoDisplay;
     [SerializeField] private RectTransform Info;
+    
+    [SerializeField] private GameObject VirtualMirror;
 
 
     private float height;
@@ -71,6 +73,10 @@ public class ChatGPTTester : MonoBehaviour
             TourButton.GetComponent<Button>().onClick.Invoke();
         }
 
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            VirtualMirroring("painting 015");
+        }
     }
 
     public void Execute(string input = "")
@@ -276,6 +282,42 @@ public class ChatGPTTester : MonoBehaviour
                 // Destroy the child GameObject
                 Destroy(parentRectTransform.GetChild(i).gameObject);
             }
+        }
+    }
+
+    private void DeleteAllChildren(GameObject obj)
+    {
+        foreach (Transform child in obj.transform)
+        {
+            Destroy(child.gameObject);
+        }
+    }
+
+    // VitualMirror: Clone the corresponding object in front of the viewer
+    private void VirtualMirroring(string item)
+    {
+        DeleteAllChildren(VirtualMirror);
+
+        string paintingObjectID = item.Replace("painting ", "placeholder.");
+        GameObject objectToClone = GameObject.Find(paintingObjectID);
+
+        if (objectToClone != null)
+        {
+            GameObject clonedObject = Instantiate(objectToClone);
+            clonedObject.transform.parent = VirtualMirror.transform;
+
+            // Position the cloned object in bottom front of the main camera
+            Vector3 newPosition = mainCamera.transform.position + mainCamera.transform.forward * 3f;
+            newPosition.y -= 1.5f;
+            clonedObject.transform.position = newPosition;
+            Quaternion newRotation = Quaternion.LookRotation(clonedObject.transform.position - mainCamera.transform.position);
+            newRotation.eulerAngles = new Vector3(-90f, newRotation.eulerAngles.y + 90f, newRotation.eulerAngles.z);
+            clonedObject.transform.rotation = newRotation;
+            clonedObject.transform.localScale /= 3f;
+        }
+        else
+        {
+            Debug.LogWarning(paintingObjectID + " not found.");
         }
     }
 }

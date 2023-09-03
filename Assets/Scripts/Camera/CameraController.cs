@@ -53,6 +53,8 @@ public class CameraController : MonoBehaviour
     private GameObject arrow;
     private float arrowSpeed = 5f;
 
+    public Minimap miniMap;
+
     private void Start()
     {
         // Find the main camera GameObject and Transform
@@ -109,6 +111,11 @@ public class CameraController : MonoBehaviour
             // mainCamera.transform.localEulerAngles = new Vector3(currentRotationX, 0f, 0f);
             MoveArrow();
             RotateTowardsDestination();
+            
+        }
+        if (playing)
+        {
+            miniMap.UpdateMinimap();
         }
 
         //if (Input.GetKeyDown(KeyCode.Alpha0))
@@ -381,7 +388,7 @@ public class CameraController : MonoBehaviour
             yield return wait;
         }
 
-        yield return null;
+        navigating = false;
     }
 
     private bool rotating = false;
