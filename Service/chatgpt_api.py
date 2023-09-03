@@ -55,7 +55,7 @@ def gpt_guidance(request):
     messages.append({"role": "assistant", "content": response})
     # print(messages)
 
-    return [tasks, response, context,landmark, tourIDs]
+    return [tasks, response, context, landmark, tourIDs]
 
 """Step 1: classify the user question into which kinds of interaction tasks
 """
