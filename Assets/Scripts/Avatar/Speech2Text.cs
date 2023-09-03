@@ -13,7 +13,7 @@ namespace OpenAI
         [SerializeField] private InputActionReference bButton;
 
         private readonly string fileName = "output.wav";
-        private readonly int duration = 50;
+        private readonly int duration = 20;
         private readonly int micro_ind = 0;
 
         private AudioClip clip;

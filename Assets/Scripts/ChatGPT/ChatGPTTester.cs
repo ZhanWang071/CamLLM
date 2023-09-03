@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ public class ChatGPTTester : MonoBehaviour
     [SerializeField] private GameObject DynamicCanvas;
     [SerializeField] private RectTransform InfoDisplay;
     [SerializeField] private RectTransform Info;
-    
+
     [SerializeField] private GameObject VirtualMirror;
 
 
@@ -39,6 +40,8 @@ public class ChatGPTTester : MonoBehaviour
 
     public GameObject Model;
 
+    public Minimap minimap;
+
     private void Start()
     {
         //ShowChatbox();
@@ -47,11 +50,16 @@ public class ChatGPTTester : MonoBehaviour
 
     private void Update()
     {
+        Test();
+    }
+
+    private void Test()
+    {
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             AppendMessage("I really interested in chinese art.", "user");
             AppendMessage("That's great! Chinese art has a rich history and is known for its unique styles and techniques.\n In our virtual museum, we have several Chinese paintings that you might find interesting. Here are a few of them:\r\n\r\n1. \"Section of Goddess of Luo River\": This painting depicts a beautiful landscape with mountains, rivers, and trees. It showcases the traditional Chinese ink painting style.\r\n\r\n2. \"Travelers among Mountains and Streams\": This painting portrays a group of travelers navigating through a mountainous landscape. It is a classic example of Chinese landscape painting.\r\n\r\nThese are just a few examples of the Chinese art we have in our museum. If you would like to explore more, I can guide you to these paintings in the virtual space.", "assistant");
-            DisplayInfo("To determine the three most popular paintings in the museum, I would need access to the popularity data of each painting. Unfortunately, the popularity information is not provided in the given data. However, I can provide you with a list of the top three most famous paintings in general:\r\n\r\n1. \"Mona Lisa\" by Leonardo da Vinci\r\n2. \"The Last Supper\" by Leonardo da Vinci\r\n3. \"The Scream\" by Edvard Munch\r\n\r\nThese paintings are widely recognized and highly regarded in the art world.");
+            DisplayInfo("To determine the three most popular paintings in the museum, I would need access to the popularity data of each painting. Unfortunately, the popularity information is not provided in the given data. However, I can provide you with a list of the top three most famous paintings in general:\r\n\r\n1. \"Mona Lisa\" by Leonardo da Vinci\r\n2. \"The Last Supper\" by Leonardo da Vinci\r\n3. \"The Scream\" by Edvard Munch\r\n\r\nThese paintings are widely recognized and highly regarded in the art world.", "");
             //DisplayInfo("Welcome to the virtual museum! This museum is home to a diverse collection of paintings from various artists and periods. The museum aims to provide visitors with an immersive and educational experience.\r\n\r\nThe museum features a wide range of artworks, including famous masterpieces such as the \"Mona Lisa\" by Leonardo da Vinci");
         }
         if (Input.GetKeyDown(KeyCode.Alpha4))
@@ -75,7 +83,8 @@ public class ChatGPTTester : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha6))
         {
-            VirtualMirroring("painting 015");
+            var text = new List<string> { "painting 013", "painting 000", "painting 001" };
+            VirtualMirroring(text);
         }
     }
 
@@ -93,6 +102,7 @@ public class ChatGPTTester : MonoBehaviour
         {
             prompt = input;
         }
+
         if (prompt == null || prompt.Length <= 0 || prompt == "you")
         {
             AppendMessage("Record Nothing! Please input your question again!", "assistant");
@@ -166,6 +176,8 @@ public class ChatGPTTester : MonoBehaviour
         var chatGPTContent = response.Content;
         var ResponseTasks = response.Tasks;
         var ResponseContext = response.Context;
+        var ResponseLandmark = response.Landmark;
+        var ResponseTourIDs = response.TourIDs;
 
         if (!string.IsNullOrEmpty(chatGPTContent))
         {
@@ -173,18 +185,22 @@ public class ChatGPTTester : MonoBehaviour
             Debug.Log("Response in voice...");
             HideChatbox();
 
-            if (ResponseTasks.Contains("information enhancement"))
-            {
-                DisplayInfo(ResponseContext);
-            }
+            if (Voice) textToSpeech.MakeAudioRequest(chatGPTContent);
 
             if (ResponseTasks.Contains("navigation"))
             {
+                DeleteAllChildren(VirtualMirror);
                 cameraController.ProcessChatGPTResponse(chatGPTContent, Voice, textToSpeech);
             }
             else
             {
-                if (Voice) textToSpeech.MakeAudioRequest(chatGPTContent);
+                minimap.HideMinimap();
+
+                if (ResponseTasks.Contains("information enhancement"))
+                {
+                    DisplayInfo(ResponseContext, ResponseLandmark);
+                    VirtualMirroring(ResponseTourIDs);
+                }
             }
         }
         else
@@ -209,15 +225,15 @@ public class ChatGPTTester : MonoBehaviour
         scroll.verticalNormalizedPosition = 0;
     }
 
-    private void DisplayInfo(string prompt)
+    private void DisplayInfo(string prompt, string landmark)
     {
-        string landmark = cameraController.GetCurrentLandmark();
+        string landmarkID = cameraController.GetCurrentLandmark();
 
         var item = Instantiate(Info, InfoDisplay);
         if (landmark.Length > 0)
         {
             item.GetChild(0).GetChild(0).GetComponent<Text>().text = landmark;
-            HightlightDetails(landmark);
+            HightlightDetails(landmarkID);
         }
         else
         {
@@ -294,9 +310,21 @@ public class ChatGPTTester : MonoBehaviour
     }
 
     // VitualMirror: Clone the corresponding object in front of the viewer
-    private void VirtualMirroring(string item)
+    private void VirtualMirroring(List<string> TourIDs)
     {
         DeleteAllChildren(VirtualMirror);
+
+        // Step 2. Update position due to the painting numbers
+        for (int i = 0; i < TourIDs.Count; i++)
+        {
+            string item = TourIDs[i];
+            float offset = 1.5f * (float)i - (float)Math.Floor((double)TourIDs.Count / 2) - 0.5f;
+            MirrorSingleItem(item, offset);
+        }
+    }
+
+    private void MirrorSingleItem(string item, float offset)
+    {
 
         string paintingObjectID = item.Replace("painting ", "placeholder.");
         GameObject objectToClone = GameObject.Find(paintingObjectID);
@@ -307,7 +335,9 @@ public class ChatGPTTester : MonoBehaviour
             clonedObject.transform.parent = VirtualMirror.transform;
 
             // Position the cloned object in bottom front of the main camera
-            Vector3 newPosition = mainCamera.transform.position + mainCamera.transform.forward * 3f;
+            //Vector3 newPosition = mainCamera.transform.position + mainCamera.transform.forward * 3f;
+            Vector3 offsetVec = mainCamera.transform.right * offset; // Move left by 1.5 units
+            Vector3 newPosition = mainCamera.transform.position + mainCamera.transform.forward * 3f + offsetVec;
             newPosition.y -= 1.5f;
             clonedObject.transform.position = newPosition;
             Quaternion newRotation = Quaternion.LookRotation(clonedObject.transform.position - mainCamera.transform.position);

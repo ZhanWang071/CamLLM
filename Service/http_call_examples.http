@@ -53,7 +53,7 @@ content-type: application/json
 {
     "question" : "Please introduce this painting to me",
     "position" : "(0.0,0.0,0.0)",
-    "landmark" : "painting 000",
+    "landmark" : "painting 013",
     "history": "[]"
 }
 

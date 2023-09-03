@@ -61,6 +61,7 @@ public class Minimap : MonoBehaviour
 
     public void UpdateMinimap()
     {
+        ShowMinimap();
         UpdatePlaceholder();
         ResetMinimapPosition();
     }

@@ -64,11 +64,11 @@ extract_prompt = """
 1. detect if the user start visiting, during the tour, or finishing the tour.
 2. If the user is at the beginning or ending of the tour, extract the context in 2-3 sentences and sometime you can use a clear way to display the information below directly such as bullet points if neccessary.
 3. Otherwise, extract the important points with words or one-sentence description.
+4. ONLY give the RESPONSE.
 
 Here are several examples:
 INPUT:
 The Great Wave off Kanagawa is a woodblock print by Japanese ukiyo-e artist Hokusai, created in late 1831 during the Edo period of Japanese history. The print depicts three boats moving through a storm-tossed sea, with a large wave forming a spiral in the centre and Mount Fuji visible in the background.
-Reason: The user is during the tour, and you need to extract the important points like author, year, and style.
 RESPONSE:
 Name: The Great Wave off Kanagawa
 Author: Hokusai

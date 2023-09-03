@@ -111,7 +111,7 @@ public class CameraController : MonoBehaviour
             // mainCamera.transform.localEulerAngles = new Vector3(currentRotationX, 0f, 0f);
             MoveArrow();
             RotateTowardsDestination();
-            
+
         }
         if (playing)
         {
@@ -225,8 +225,6 @@ public class CameraController : MonoBehaviour
             tourIDs = tourResponse.TourID;
             //string reasoning = tourResponse.Reasoning;
             tours = tourResponse.Tour;
-
-            if (Voice) textToSpeech.MakeAudioRequest(tourResponse.Introduction);
 
             OnTourIDsReceived?.Invoke(tourIDs);
             Debug.Log("Start navigation");
@@ -467,7 +465,7 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    private static List<string> visitedTour = new List<string>();
+    private static List<string> visitedTour = new List<string> { };
     public List<string> GetTourHistory()
     {
         return visitedTour;
