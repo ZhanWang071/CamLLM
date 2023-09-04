@@ -124,7 +124,9 @@ def gpt_navigation(question, position, landmark, history, model="gpt-3.5-turbo-1
     result = extract_json_part(result)
     # print("JSON-LIKE: "+ str(result))
     
-    if (result is not None): result = reorder_landmarks(result, position)
+    if (result is not None): 
+        result = reorder_landmarks(result, position)
+        response.choices[0].message["content"] = result
 
     return result
 

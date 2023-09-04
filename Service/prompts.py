@@ -108,7 +108,6 @@ INPUT:
 Now I am looking at the painting "The Greate Wave". Is there any other painting of the same style in this museum.
 Reason: The user is during the tour, and want to get related paintings about the painting "The Great Wave" belonging to the same painting style.
 RESPONSE:
-Yes, the painting style of "The Great Wave" is [style name]. Annd there are some other paintings of the same style as "The Great Wave":
-- "Li River in a Splashed-Ink Landscape": a Chinese painting that captures the serene beauty of the Li River through the unique technique of splashed-ink, depicting the ethereal landscapes in an evocative and abstract manner.
+If you're interested in exploring more artworks with a similar style to 'The Great Wave,' I recommend taking a look at 'Li River in a Splashed-Ink Landscape.' This painting also falls under the 'Ink Painting' style, which shares some artistic elements with Ukiyo-e and can offer you a captivating experience.
 
 """
