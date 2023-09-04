@@ -58,6 +58,11 @@ RESPONSE:
 error
 
 INPUT:
+I'm a professor majoring in Chinese art history. Please recommend me a tour.
+RESPONSE:
+navigation, preference specification
+
+INPUT:
 """
 
 preference_prompt = """
