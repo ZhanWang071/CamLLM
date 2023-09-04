@@ -304,7 +304,7 @@ data_spatial = {
         },
         "painting 018": {
             "name": "Composition no.10",
-            "author": "Piet Mondrian",
+            "author": "Mondrian",
             "country": "Netherlands",
             "style": "De Stijl",
             "position": [27.75, 1.6, -5.2]
@@ -563,22 +563,22 @@ To provide you with a general idea, some of the most well-known paintings in thi
 INPUT: Take me to visit them.
 RESPONSE:
 {{
-    "Introduction": "Now let's begin our tour.First, we will head towards the painting "Mona Lisa." It is a masterpiece by Leonardo da Vinci and is known for its enigmatic smile. We will navigate through the museum to reach its designated location.",
-    "Tour": ["Mona Lisa", "Last Supper", "Vitruvian Man"],
-    "TourID": ["painting 000","painting 001","painting 002"]
+    "Introduction": "Now let's begin our tour.First, we will head towards the painting "Mona Lisa." It is a masterpiece by Leonardo da Vinci and is known for its enigmatic smile.",
+    "Tour": ["Mona Lisa", "Vitruvian Man", "Last Supper"],
+    "TourID": ["painting 000","painting 002","painting 001"]
 }}
 INPUT: I have visited these paintings ["painting 000"]. I want to see the next painting.
 RESPONSE:
 {{
     "Introduction": "Now, let's move on to the 'Last Supper'. Follow me as we navigate through the museum to find the painting.",
-    "Tour": ["Last Supper", "Vitruvian Man"],
-    "TourID": ["painting 001","painting 002"]
+    "Tour": [""Vitruvian Man",Last Supper"],
+    "TourID": ["painting 002","painting 001"]
 }}
 
 INPUT: I want to see some modern style paintings, could you
 RESPONSE:
 {{
-    "Introduction": "Certainly! Here are some modern style painting. Let's begin out tour. We first head towards the painting "DasUndbild"",
+    "Introduction": "Certainly! Here are some modern style painting. Let's begin our tour. We first head towards the painting "DasUndbild"",
     "Tour": ["DasUndbild", "Caoutchouc","Composition","Head(Tête)"],
     "TourID": ["painting 016","painting 017","painting 018","painting 019"]
 }}

@@ -40,11 +40,11 @@ public class Minimap : MonoBehaviour
     // reset the minimap position in the left front
     public void ResetMinimapPosition()
     {
-        Vector3 userForward = mainCamera.transform.forward;
-        Vector3 userRight = mainCamera.transform.right;
+        Vector3 userForward = userAvatar.transform.forward;
+        Vector3 userRight = userAvatar.transform.right;
         Vector3 offset = (userForward - userRight).normalized;
         Vector3 newPosition = mainCamera.transform.position + (offset * 2f);
-        newPosition += Camera.main.transform.right * 0.4f;
+        newPosition += userAvatar.transform.right * 0.4f;
         newPosition.y = 17f;
         minimap.transform.position = newPosition;
 

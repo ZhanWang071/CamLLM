@@ -54,7 +54,7 @@ content-type: application/json
     "question" : "Please introduce this painting to me",
     "position" : "(0.0,0.0,0.0)",
     "landmark" : "painting 013",
-    "history": "[]"
+    "history": []
 }
 
 POST http://127.0.0.1:5000/chatgpt/question?debug=true HTTP/1.1
