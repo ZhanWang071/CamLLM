@@ -42,6 +42,8 @@ public class ChatGPTTester : MonoBehaviour
 
     public Minimap minimap;
 
+    public GameObject userAvatar;
+
     private void Start()
     {
         //ShowChatbox();
@@ -254,7 +256,7 @@ public class ChatGPTTester : MonoBehaviour
     private void ResetHighlightCanvasPos()
     {
         // reset the position of the canvas of info display
-        Vector3 rightOffset = Quaternion.Euler(0, angleFromCamera, 0) * mainCamera.transform.forward;
+        Vector3 rightOffset = Quaternion.Euler(0, angleFromCamera, 0) * userAvatar.transform.forward;
         Vector3 newPosition = mainCamera.transform.position + (rightOffset.normalized * distanceFromCamera);
         DynamicCanvas.transform.position = newPosition;
         DynamicCanvas.transform.rotation = Quaternion.LookRotation(DynamicCanvas.transform.position - mainCamera.transform.position);
@@ -263,7 +265,7 @@ public class ChatGPTTester : MonoBehaviour
     private void ResetCanvasPos()
     {
         // reset the position of the canvas of chatbox
-        Vector3 newPosition = mainCamera.transform.position + mainCamera.transform.forward * distanceFromCamera;
+        Vector3 newPosition = mainCamera.transform.position + userAvatar.transform.forward * distanceFromCamera;
         Canvas.transform.position = newPosition;
         Canvas.transform.rotation = Quaternion.LookRotation(Canvas.transform.position - mainCamera.transform.position);
     }
@@ -336,8 +338,8 @@ public class ChatGPTTester : MonoBehaviour
 
             // Position the cloned object in bottom front of the main camera
             //Vector3 newPosition = mainCamera.transform.position + mainCamera.transform.forward * 3f;
-            Vector3 offsetVec = mainCamera.transform.right * offset; // Move left by 1.5 units
-            Vector3 newPosition = mainCamera.transform.position + mainCamera.transform.forward * 3f + offsetVec;
+            Vector3 offsetVec = userAvatar.transform.right * offset; // Move left by 1.5 units
+            Vector3 newPosition = mainCamera.transform.position + userAvatar.transform.forward * 3f + offsetVec;
             newPosition.y -= 1.5f;
             clonedObject.transform.position = newPosition;
             Quaternion newRotation = Quaternion.LookRotation(clonedObject.transform.position - mainCamera.transform.position);
