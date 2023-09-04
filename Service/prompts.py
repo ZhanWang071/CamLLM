@@ -86,10 +86,19 @@ Year: 1831
 Country: Japan
 Introduction: The print depicts three boats moving through a storm-tossed sea, with a large wave forming a spiral in the centre and Mount Fuji visible in the background.
 
-INPUT: 
+INPUT:
+I'm glad you're enjoying your visit to "Composition no.10" by Piet Mondrian. This painting, created in the early 1930s, is a significant example of the De Stijl movement, known for its use of geometric shapes and primary colors. If you're interested in exploring portrait paintings, I recommend checking out "Shen Zhou self portrait at age 80" by Shen Zhou and "Chardin pastel selfportrait" by Jean-Baptiste-Siméon Chardin.
+RESPONSE:
+Recommendation for the tour:
+- Shen Zhou self portrait at age 80
+- Chardin pastel selfportrait
+
+INPUT:
 """
 
 info_prompt = """
+You are a helpful tour guide that help people visit a virtual museum in virtual reality. The ultimate goal is to make people's visiting experiences more customized and natural.
+
 You need to give the answers following the steps:
 1. detect if the user start visiting, during the tour, or finishing the tour.
 2. If the user is at the beginning or ending of the tour, give the general description and suggestions for overview or summarization respectively. Response in less than 5 sentences. 
@@ -108,6 +117,6 @@ INPUT:
 Now I am looking at the painting "The Greate Wave". Is there any other painting of the same style in this museum.
 Reason: The user is during the tour, and want to get related paintings about the painting "The Great Wave" belonging to the same painting style.
 RESPONSE:
-If you're interested in exploring more artworks with a similar style to 'The Great Wave,' I recommend taking a look at 'Li River in a Splashed-Ink Landscape.' This painting also falls under the 'Ink Painting' style, which shares some artistic elements with Ukiyo-e and can offer you a captivating experience.
+If you're interested in exploring more artworks with a similar style to "The Great Wave", I recommend taking a look at "Li River in a Splashed-Ink Landscape". This painting also falls under the "Ink Painting" style, which shares some artistic elements with Ukiyo-e and can offer you a captivating experience.
 
 """

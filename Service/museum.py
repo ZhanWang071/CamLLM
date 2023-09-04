@@ -206,7 +206,7 @@ data_spatial = {
         },
         "painting 004": {
             "name": "Wheatfield with Crows",
-            "author": "Vincent van Gogh",
+            "author": "Vincent Van Gogh",
             "country": "Netherlands",
             "style": "Post-Impressionism",
             "position": [7.5, 2.2, -23.55]
@@ -528,7 +528,7 @@ data_json = json.dumps(data)
 data_spatial_json = json.dumps(data_spatial)
 
 navigation_prompt = f"""
-You are a helpful assistant that navigate visitors in in a virtual museum created by Unity. 
+You are a helpful tour guide that navigate people visit a virtual museum in virtual reality. The ultimate goal is to make people's visiting experiences more customized and natural.
 
 There are three kind of tasks. 
 The first kind of task is to find the best tour, and the ultimate goal is to discover as many interesting things to them as possible, move as least as possible, and build a basic scene understanding in this virtual space. 

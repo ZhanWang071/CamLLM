@@ -273,6 +273,7 @@ def reorder_landmarks(result, start_position):
 def extract_paintings(context, landmark):
     painting_ids = []
     pattern = r'"([^"]+)"'
+    context = context.replace("'", "\"")
     painting_names = list(set(re.findall(pattern, context)))
     for painting_id, painting_info in museum.data["paintings"].items():
         if painting_info["name"] in painting_names:
