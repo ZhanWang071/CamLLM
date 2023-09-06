@@ -6,7 +6,7 @@ import museum
 import prompts
 import copy
 import re
-import ast
+from fuzzywuzzy import fuzz
 
 openai.api_key = "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"
 
@@ -275,9 +275,12 @@ def extract_paintings(context, landmark):
     pattern = r'"([^"]+)"'
     context = context.replace("'", "\"")
     painting_names = list(set(re.findall(pattern, context)))
-    for painting_id, painting_info in museum.data["paintings"].items():
-        if painting_info["name"] in painting_names:
-            painting_ids.append(painting_id)
+    for painting_id, painting_info in museum.data_spatial["paintings"].items():
+        # if painting_info["name"] in painting_names:
+        #     painting_ids.append(painting_id)
+        for name in painting_names:
+            if fuzz.ratio(name, painting_info["name"]) >= 80:  # Adjust the similarity threshold as needed
+                painting_ids.append(painting_id)
     
     # Delete landmark from result
     if len(landmark) and (landmark in painting_ids):
@@ -292,5 +295,5 @@ if __name__ == "__main__":
     # print(result_ordered)
 
     context = """Yes, the painting style of "The Great Wave" is [style name]. Annd there are some other paintings of the same style as "The Great Wave":
-- "Li River in a Splashed-Ink Landscape": a Chinese painting that captures the serene beauty of the Li River through the unique technique of splashed-ink, depicting the ethereal landscapes in an evocative and abstract manner."""
+- "Li River in a splashed ink Landscape": a Chinese painting that captures the serene beauty of the Li River through the unique technique of splashed-ink, depicting the ethereal landscapes in an evocative and abstract manner."""
     print(extract_paintings(context, "painting 013")) # ["The Great Wave",  "Li River in a Splashed-Ink Landscape"]
