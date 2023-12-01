@@ -274,16 +274,17 @@ def extract_paintings(context, landmark):
     painting_ids = []
     pattern = r'"([^"]+)"'
     context = context.replace("'", "\"")
-    painting_names = list(set(re.findall(pattern, context)))
-    for painting_id, painting_info in museum.data_spatial["paintings"].items():
+    painting_names = list(re.findall(pattern, context))
+    for name in painting_names:
+        for painting_id, painting_info in museum.data_spatial["paintings"].items():
         # if painting_info["name"] in painting_names:
         #     painting_ids.append(painting_id)
-        for name in painting_names:
+        
             if fuzz.ratio(name, painting_info["name"]) >= 80:  # Adjust the similarity threshold as needed
                 painting_ids.append(painting_id)
     
     # Delete landmark from result
-    if len(landmark) and (landmark in painting_ids):
+    while len(landmark) and (landmark in painting_ids):
         painting_ids.remove(landmark)
     
     return painting_ids

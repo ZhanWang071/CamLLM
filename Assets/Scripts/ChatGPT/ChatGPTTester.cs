@@ -48,6 +48,7 @@ public class ChatGPTTester : MonoBehaviour
     {
         //ShowChatbox();
         HideChatbox();
+        caseid = 0;
     }
 
     private void Update()
@@ -57,41 +58,101 @@ public class ChatGPTTester : MonoBehaviour
 
     private void Test()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha2))
+        if (Input.GetKeyDown(KeyCode.Alpha6))
         {
             AppendMessage("I really interested in chinese art.", "user");
             AppendMessage("That's great! Chinese art has a rich history and is known for its unique styles and techniques.\n In our virtual museum, we have several Chinese paintings that you might find interesting. Here are a few of them:\r\n\r\n1. \"Section of Goddess of Luo River\": This painting depicts a beautiful landscape with mountains, rivers, and trees. It showcases the traditional Chinese ink painting style.\r\n\r\n2. \"Travelers among Mountains and Streams\": This painting portrays a group of travelers navigating through a mountainous landscape. It is a classic example of Chinese landscape painting.\r\n\r\nThese are just a few examples of the Chinese art we have in our museum. If you would like to explore more, I can guide you to these paintings in the virtual space.", "assistant");
-            DisplayInfo("To determine the three most popular paintings in the museum, I would need access to the popularity data of each painting. Unfortunately, the popularity information is not provided in the given data. However, I can provide you with a list of the top three most famous paintings in general:\r\n\r\n1. \"Mona Lisa\" by Leonardo da Vinci\r\n2. \"The Last Supper\" by Leonardo da Vinci\r\n3. \"The Scream\" by Edvard Munch\r\n\r\nThese paintings are widely recognized and highly regarded in the art world.", "");
+            //DisplayInfo("To determine the three most popular paintings in the museum, I would need access to the popularity data of each painting. Unfortunately, the popularity information is not provided in the given data. However, I can provide you with a list of the top three most famous paintings in general:\r\n\r\n1. \"Mona Lisa\" by Leonardo da Vinci\r\n2. \"The Last Supper\" by Leonardo da Vinci\r\n3. \"The Scream\" by Edvard Munch\r\n\r\nThese paintings are widely recognized and highly regarded in the art world.", "");
             //DisplayInfo("Welcome to the virtual museum! This museum is home to a diverse collection of paintings from various artists and periods. The museum aims to provide visitors with an immersive and educational experience.\r\n\r\nThe museum features a wide range of artworks, including famous masterpieces such as the \"Mona Lisa\" by Leonardo da Vinci");
+        }
+        //if (Input.GetKeyDown(KeyCode.Alpha4))
+        //{
+        //    HightlightDetails("painting 015");
+        //}
+
+        //// X button: chat button
+        //if (Input.GetKeyDown(KeyCode.X))
+        //{
+        //    // Trigger the click event of the tour button
+        //    ChatboxButton.GetComponent<Button>().onClick.Invoke();
+        //}
+
+        //// A button: tour button
+        //if (Input.GetKeyDown(KeyCode.RightArrow))
+        //{
+        //    // Trigger the click event of the tour button
+        //    TourButton.GetComponent<Button>().onClick.Invoke();
+        //}
+
+        //if (Input.GetKeyDown(KeyCode.Alpha6))
+        //{
+        //    var text = new List<string> { "painting 013", "painting 000", "painting 001" };
+        //    VirtualMirroring(text);
+        //}
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            Execute(case1[caseid]);
+            caseid += 1;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            Execute(case2[caseid]);
+            caseid += 1;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            Execute(case3[caseid]);
+            caseid += 1;
+            
         }
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            HightlightDetails("painting 015");
+            //var text = new List<string> { "painting 016", "painting 017", "painting 018", "painting 019"};
+            //VirtualMirroring(text);
+            Execute(case4[caseid]);
+            caseid += 1;
         }
-
-        // X button: chat button
-        if (Input.GetKeyDown(KeyCode.X))
+        if (Input.GetKeyDown(KeyCode.Alpha5))
         {
-            // Trigger the click event of the tour button
-            ChatboxButton.GetComponent<Button>().onClick.Invoke();
-        }
-
-        // A button: tour button
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            // Trigger the click event of the tour button
-            TourButton.GetComponent<Button>().onClick.Invoke();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha6))
-        {
-            var text = new List<string> { "painting 013", "painting 000", "painting 001" };
-            VirtualMirroring(text);
+            DisplayInfo("Recommendation for the tour:\r\n- Section of Goddess of Luo River\r\n- Travelers among Mountains and Streams\r\n- A Man and His Horse in the Wind\r\n- Forest Grotto at Juqu\r\n- Shen Zhou self portrait at age 80\r\n", "");
         }
     }
+    private int caseid = 0;
+    private string[] case1 = new string[] {
+        "Please help me plan a tour for this museum in 30 minutes",
+        "Take me to visit Impression, Sunrise",
+        "Take me to visit The Scream",
+        "Take me to visit Mona Lisa",
+        "Summarize the tour and suggest the next painting"
+    };
+    private string[] case2 = new string[] {
+        "Take me to visit the painting named The Birth of Venus",
+        "Please introduce this painting to me",
+        "What are the interesting details in this painting",
+        "Who is the people in the middle of this painting",
+        "is there any other paintings of the similar style to this painting in this museum?"
+    };
+    private string[] case3 = new string[] {
+        "I really like Chinese paintings",
+        "GIve me some recommendations for Chinese paintings in this museum",
+        "Introduce the second painting you just recommended Travelers among Mountains and Streams",
+        "Take me to visit this painting Travelers among Mountains and Streams",
+        "Take me to the closet chinese painting Forest Grotto at Juqu"
+    };
+    private string[] case4 = new string[] {
+        //"What is the weather today?",
+        //"I really like abstract paintings",
+        //"How many french paintings in this museum?",
+        //"List some French paintings",
+        "Take me to see the painting Composition No.10",
+        "Introduce this painting"
+    };
 
     public void Execute(string input = "")
     {
+        input = case3[caseid];
+        caseid += 1;
+
         Debug.Log("Send the message");
 
         DeleteChildren(InfoDisplay);
@@ -202,6 +263,14 @@ public class ChatGPTTester : MonoBehaviour
                 {
                     DisplayInfo(ResponseContext, ResponseLandmark);
                     VirtualMirroring(ResponseTourIDs);
+                    //var text = new List<string> { "painting 000", "painting 001" };
+                    //VirtualMirroring(text);
+                    if (caseid == 2)
+                    {
+                        var text = new List<string> { "painting 008", "painting 009", "painting 010", "painting 011", "painting 012" };
+                        //var text = new List<string> { "painting 000" };
+                        VirtualMirroring(text);
+                    }
                 }
             }
         }
@@ -282,6 +351,17 @@ public class ChatGPTTester : MonoBehaviour
         {
             GameObject specificHighlight = highlightTransform.gameObject;
             specificHighlight.SetActive(true);
+            //if (caseid == 3 || caseid == 4) specificHighlight.SetActive(true);
+            //if (caseid == 3)
+            //{
+            //    highlightTransform.GetChild(1).gameObject.SetActive(true);
+            //    highlightTransform.GetChild(2).gameObject.SetActive(true);
+            //}
+            //if (caseid == 4)
+            //{
+            //    highlightTransform.GetChild(1).gameObject.SetActive(false);
+            //    highlightTransform.GetChild(2).gameObject.SetActive(false);
+            //}
         }
         else
         {

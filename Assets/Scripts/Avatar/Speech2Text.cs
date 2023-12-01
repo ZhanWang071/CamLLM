@@ -14,7 +14,7 @@ namespace OpenAI
 
         private readonly string fileName = "output.wav";
         private readonly int duration = 10;
-        private readonly int micro_ind = 0;
+        private readonly int micro_ind = 1;
 
         private AudioClip clip;
         private OpenAIApi openai = new OpenAIApi("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");

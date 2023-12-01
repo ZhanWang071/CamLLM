@@ -20,7 +20,13 @@ Here are examples:
 INPUT: 
 Please give me a tour to visit this virtual museum.
 RESPONSE: 
-navigation
+information enhancement
+
+Here are examples: 
+INPUT: 
+Please help me plan a tour in 30 minutes.
+RESPONSE: 
+information enhancement
 
 INPUT: 
 Please guide me to the three most popular items.
